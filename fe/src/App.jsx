@@ -23,6 +23,9 @@ import StoreUserManagePage from "./pages/StoreUserManagePage";
 import AdminCreateOrderPage from "./pages/AdminCreateOrderPage";
 import AdminImportGoodsPage from "./pages/AdminImportGoodsPage";
 import ShipperDashboard from "./pages/ShipperDashboard";
+import EditProductPage from "./pages/EditProductPage";
+import ProductManagePage from "./pages/ProductManagePage";
+import AdminAccountPage from "./pages/AdminAccountPage";
 // ======================================
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
@@ -94,8 +97,11 @@ function App() {
         {/* === CÁC ROUTE ADMIN (dùng AdminLayout) === */}
         <Route path="/admin" element={<AdminLayout />}>
           {/* <Route index element={<AdminDashboard />} /> {/* Trang chủ admin */}
+          <Route path="account" element={<AdminAccountPage />} />
           <Route path="inventory" element={<InventoryPage />} />
+          <Route path="products" element={<ProductManagePage />} />
           <Route path="products/new" element={<AddProductPage />} />
+          <Route path="products/edit/:productId" element={<EditProductPage />} />
           <Route path="services" element={<ServiceListPage />} />
           <Route path="services/new" element={<AddServicePage />} />
           <Route path="appointments" element={<AppointmentManagePage />} />

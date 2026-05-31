@@ -1,9 +1,16 @@
 import React from "react";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useAuth } from '../context/AuthContext';
 
 function AdminHeader() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = (e) => {
+    e.preventDefault();
+    logout();
+    navigate("/admin/login");
+  };
   
   // Fake Role kiểm tra nếu context chưa load kịp
   const userRole = user?.role || user?.role_name || 'ROLE_ADMIN';
@@ -27,7 +34,6 @@ function AdminHeader() {
             </Link>
           </div>
           <nav className="nav-links">
-            <NavLink to="/">Trang chủ</NavLink>
             
             {isShipper && <NavLink to="/admin/shipper">Giao hàng</NavLink>}
             {canViewOrders && <NavLink to="/admin/orders">Quản lý đơn hàng</NavLink>}
@@ -35,40 +41,50 @@ function AdminHeader() {
             {canViewInventory && <NavLink to="/admin/inventory">Quản lý kho</NavLink>}
             
             {canViewServicesAndProducts && (
-              <>
-                <NavLink to="/admin/products/new">Tạo sản phẩm</NavLink>
-                <NavLink to="/admin/services">Quản lý dịch vụ</NavLink>
-                <NavLink to="/admin/services/new">Tạo dịch vụ</NavLink>
-              </>
+              <div className="user-dropdown" style={{ display: 'inline-block', margin: '0 10px', paddingTop: '5px' }}>
+                <span style={{ color: 'white', cursor: 'pointer', fontWeight: 'bold' }}>Sản phẩm & Dịch vụ <i className="fas fa-caret-down"></i></span>
+                <div className="dropdown-content">
+                  <NavLink to="/admin/products/new">Tạo sản phẩm</NavLink>
+                  <NavLink to="/admin/products" end>Quản lý sản phẩm</NavLink>
+                  <NavLink to="/admin/services/new">Tạo dịch vụ</NavLink>
+                  <NavLink to="/admin/services" end>Quản lý dịch vụ</NavLink>
+                </div>
+              </div>
             )}
 
             {canViewAppointments && <NavLink to="/admin/appointments">Quản lý Đặt lịch</NavLink>}
             
             {canViewUsersAndStores && (
-              <>
-                <NavLink to="/admin/users">Phân quyền</NavLink>
-                <NavLink to="/admin/store-users">Phân Quản lý kho</NavLink>
-              </>
+              <div className="user-dropdown" style={{ display: 'inline-block', margin: '0 10px', paddingTop: '5px' }}>
+                <span style={{ color: 'white', cursor: 'pointer', fontWeight: 'bold' }}>Hệ thống <i className="fas fa-caret-down"></i></span>
+                <div className="dropdown-content">
+                  <NavLink to="/admin/users">Phân quyền</NavLink>
+                  <NavLink to="/admin/store-users">Phân Quản lý kho</NavLink>
+                </div>
+              </div>
             )}
           </nav>
           <div className="nav-icons">
-            <div className="user-dropdown">
-              <button className="user-btn">
-                <i className="fas fa-user-circle"></i> Quản trị{" "}
-                <i className="fas fa-caret-down"></i>
-              </button>
-              <div className="dropdown-content">
-                <Link to="/admin/account">
-                  <i className="fas fa-user"></i> Tài khoản
+            {user ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                <Link to="/admin/account" title="Thông tin tài khoản" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', textDecoration: 'none', color: '#f8f1f1ff', marginRight: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <i className="fa-solid fa-id-card"></i>
+                    <span style={{ fontWeight: 'bold', fontSize: '14px' }}>{user.name || 'Admin'}</span>
+                  </div>
+                  <span style={{ fontSize: '12px', color: '#ddd', marginTop: '2px' }}>{userRole}</span>
                 </Link>
-                <a href="#">
-                  <i className="fas fa-cog"></i> Cài đặt
-                </a>
-                <Link to="/logout">
-                  <i className="fas fa-sign-out-alt"></i> Đăng xuất
-                </Link>
+                <button 
+                  onClick={handleLogout} 
+                  title="Đăng xuất"
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '20px', color: '#f8f1f1ff', marginRight: '15px', transform: 'translateY(-5px)' }}
+                >
+                  <i className="fa-solid fa-arrow-right-from-bracket"></i>
+                </button>
               </div>
-            </div>
+            ) : (
+              <Link to="/admin/login">Đăng nhập</Link>
+            )}
           </div>
         </div>
       </div>
