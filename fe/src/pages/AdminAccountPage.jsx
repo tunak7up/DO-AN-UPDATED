@@ -85,10 +85,10 @@ function AdminAccountPage() {
 
   return (
     <div className="container" style={{ padding: '40px 0' }}>
-      <div style={{ display: 'flex', gap: '30px', alignItems: 'flex-start' }}>
+      <div className="account-layout">
         
         {/* --- SIDEBAR MENU --- */}
-        <div style={{ width: '250px', background: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
+        <div className="account-sidebar">
           <div style={{ textAlign: 'center', marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '20px' }}>
             <div style={{ width: '80px', height: '80px', background: '#3498db', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '30px', margin: '0 auto 10px' }}>
               <i className="fas fa-user-shield"></i>
@@ -114,7 +114,7 @@ function AdminAccountPage() {
         </div>
 
         {/* --- CONTENT AREA --- */}
-        <div style={{ flex: 1, background: 'white', padding: '30px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
+        <div className="account-content">
           
           {/* TAB 1: THÔNG TIN TÀI KHOẢN */}
           {activeTab === 'profile' && (
