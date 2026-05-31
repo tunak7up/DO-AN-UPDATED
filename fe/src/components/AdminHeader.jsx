@@ -41,8 +41,8 @@ function AdminHeader() {
             {canViewInventory && <NavLink to="/admin/inventory">Quản lý kho</NavLink>}
             
             {canViewServicesAndProducts && (
-              <div className="user-dropdown" style={{ display: 'inline-block', margin: '0 10px', paddingTop: '5px' }}>
-                <span style={{ color: 'white', cursor: 'pointer', fontWeight: 'bold' }}>Sản phẩm & Dịch vụ <i className="fas fa-caret-down"></i></span>
+              <div className="user-dropdown" style={{ display: 'inline-block', margin: '0 10px', paddingTop: '0' }}>
+                <span style={{ color: 'white', cursor: 'pointer', fontWeight: 'bold', textAlign: 'center', position: 'relative' }}>Sản phẩm & Dịch vụ<i className="fas fa-caret-down" style={{ position: 'absolute', bottom: '-15px', left: '50%', transform: 'translateX(-50%)' }}></i></span>
                 <div className="dropdown-content">
                   <NavLink to="/admin/products/new">Tạo sản phẩm</NavLink>
                   <NavLink to="/admin/products" end>Quản lý sản phẩm</NavLink>
@@ -55,8 +55,8 @@ function AdminHeader() {
             {canViewAppointments && <NavLink to="/admin/appointments">Quản lý Đặt lịch</NavLink>}
             
             {canViewUsersAndStores && (
-              <div className="user-dropdown" style={{ display: 'inline-block', margin: '0 10px', paddingTop: '5px' }}>
-                <span style={{ color: 'white', cursor: 'pointer', fontWeight: 'bold' }}>Hệ thống <i className="fas fa-caret-down"></i></span>
+              <div className="user-dropdown" style={{ display: 'inline-block', margin: '0 10px', paddingTop: '0' }}>
+                <span style={{ color: 'white', cursor: 'pointer', fontWeight: 'bold', textAlign: 'center', position: 'relative' }}>Hệ thống<i className="fas fa-caret-down" style={{ position: 'absolute', bottom: '-15px', left: '50%', transform: 'translateX(-50%)' }}></i></span>
                 <div className="dropdown-content">
                   <NavLink to="/admin/users">Phân quyền</NavLink>
                   <NavLink to="/admin/store-users">Phân Quản lý kho</NavLink>
@@ -67,17 +67,17 @@ function AdminHeader() {
           <div className="nav-icons">
             {user ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                <Link to="/admin/account" title="Thông tin tài khoản" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', textDecoration: 'none', color: '#f8f1f1ff', marginRight: '10px' }}>
+                <Link to="/admin/account" title="Thông tin tài khoản" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', textDecoration: 'none', color: '#f8f1f1ff', marginRight: '10px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                     <i className="fa-solid fa-id-card"></i>
-                    <span style={{ fontWeight: 'bold', fontSize: '14px' }}>{user.name || 'Admin'}</span>
+                    <span className="hide-on-mobile" style={{ fontWeight: 'bold', fontSize: '14px' }}>{user.name || 'Admin'}</span>
                   </div>
-                  <span style={{ fontSize: '12px', color: '#ddd', marginTop: '2px' }}>{userRole}</span>
+                  <span className="hide-on-mobile" style={{ fontSize: '12px', color: '#ddd', marginTop: '2px' }}>{userRole}</span>
                 </Link>
                 <button 
                   onClick={handleLogout} 
                   title="Đăng xuất"
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '20px', color: '#f8f1f1ff', marginRight: '15px', transform: 'translateY(-5px)' }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '20px', color: '#f8f1f1ff', marginRight: '15px', transform: 'translateY(0)' }}
                 >
                   <i className="fa-solid fa-arrow-right-from-bracket"></i>
                 </button>

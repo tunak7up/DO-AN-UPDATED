@@ -36,12 +36,12 @@ function Header() {
               <>
                 <Link to="/account" title="Thông tin tài khoản" style={{ marginRight: '10px' }}>
                   <i className="fa-solid fa-id-card"></i>
-                  <span style={{ marginLeft: '5px', fontWeight: 'bold' }}>{user.name}</span>
+                  <span className="hide-on-mobile" style={{ marginLeft: '5px', fontWeight: 'bold' }}>{user.name}</span>
                 </Link>
                 <button 
                   onClick={handleLogout} 
                   title="Đăng xuất"
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '20px', color: '#f8f1f1ff', marginRight: '15px', transform: 'translateY(-10px)' }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '20px', color: '#f8f1f1ff', marginRight: '15px', transform: 'translateY(0)' }}
                 >
                   <i className="fa-solid fa-arrow-right-from-bracket"></i>
                 </button>
