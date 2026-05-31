@@ -1,9 +1,10 @@
+import { API_URL, BASE_URL } from '../api.js';
 import React, { createContext, useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useAuth } from "./AuthContext";
 
 const CartContext = createContext();
-const API_URL = "http://localhost:3000/api";
+
 const USER_ID = 1; // Hardcode userId vì chưa có login
 
 export const CartProvider = ({ children }) => {

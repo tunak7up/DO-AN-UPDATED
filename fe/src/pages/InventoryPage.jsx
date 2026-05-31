@@ -1,3 +1,4 @@
+import { API_URL, BASE_URL } from '../api.js';
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import EditProductModal from "../components/EditProductModal";
@@ -5,7 +6,7 @@ import AdjustStockModal from "../components/AdjustStockModal";
 import { useAuth } from '../context/AuthContext';
 import { Link } from "react-router-dom";
 
-const API_URL = "http://localhost:3000/api";
+
 
 // === Component con: Quản lý 1 dòng sản phẩm ===
 // Tách ra cho dễ quản lý state

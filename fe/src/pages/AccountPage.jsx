@@ -1,9 +1,10 @@
+import { API_URL, BASE_URL } from '../api.js';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
-const API_URL = 'http://localhost:3000/api';
+
 
 // Hàm format tiền tệ
 const formatCurrency = (number) => {
@@ -319,7 +320,7 @@ function AccountPage() {
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               {selectedOrder.items && selectedOrder.items.map((item, index) => (
                 <li key={index} style={{ display: 'flex', gap: '15px', marginBottom: '15px', paddingBottom: '15px', borderBottom: '1px dashed #eee' }}>
-                  <img src={item.product?.thumbnail?.startsWith('http') ? item.product.thumbnail : `http://localhost:3000${item.product?.thumbnail}`} alt="" style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '5px', border: '1px solid #ddd' }} />
+                  <img src={item.product?.thumbnail?.startsWith('http') ? item.product.thumbnail : `${BASE_URL}${item.product?.thumbnail}`} alt="" style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '5px', border: '1px solid #ddd' }} />
                   <div style={{ flex: 1 }}>
                     <h5 style={{ margin: '0 0 5px 0', fontSize: '15px' }}>
                       <a href={`/product/${item.product?.id}`} target="_blank" rel="noreferrer" style={{ color: '#3498db', textDecoration: 'none' }}>

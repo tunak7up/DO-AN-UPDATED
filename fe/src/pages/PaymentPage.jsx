@@ -1,10 +1,11 @@
+import { API_URL, BASE_URL } from '../api.js';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3000/api';
+
 const USER_ID = 1; // Hardcode user_id
 
 function PaymentPage() {

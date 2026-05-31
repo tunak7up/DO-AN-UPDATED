@@ -1,9 +1,10 @@
+import { API_URL, BASE_URL } from '../api.js';
 import React, { useState, useEffect } from "react";
 
 import { Link, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const API_URL = "http://localhost:3000/api";
+
 
 // Hàm trợ giúp định dạng tiền tệ
 const formatCurrency = (number) => {

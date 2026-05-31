@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_URL, BASE_URL } from '../api.js';
 
-const API_URL = 'http://localhost:3000/api';
 
 const EditServiceModal = ({ service, categories, isOpen, onClose, onSave }) => {
   const [formData, setFormData] = useState({ ...service });

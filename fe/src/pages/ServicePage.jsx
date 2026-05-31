@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { API_URL, BASE_URL } from '../api.js';
 
-const API_URL = "http://localhost:3000/api";
 
 const formatCurrency = (number) => {
   return new Intl.NumberFormat("vi-VN", {

@@ -1,8 +1,9 @@
+import { API_URL, BASE_URL } from '../api.js';
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from '../context/AuthContext';
 
-const API_URL = "http://localhost:3000/api";
+
 
 const formatCurrency = (number) => {
   return new Intl.NumberFormat("vi-VN", {
@@ -197,7 +198,7 @@ function ShipperDashboard() {
               <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
                 {selectedOrder.items && selectedOrder.items.map((item, index) => (
                   <li key={index} style={{ display: "flex", gap: "10px", marginBottom: "15px", borderBottom: "1px solid #eee", paddingBottom: "10px" }}>
-                    <img src={item.product?.thumbnail?.startsWith('http') ? item.product.thumbnail : `http://localhost:3000${item.product?.thumbnail}`} alt="" style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "6px" }} />
+                    <img src={item.product?.thumbnail?.startsWith('http') ? item.product.thumbnail : `${BASE_URL}${item.product?.thumbnail}`} alt="" style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "6px" }} />
                     <div>
                       <h5 style={{ margin: "0 0 5px 0", fontSize: "14px" }}>{item.product?.title || 'Sản phẩm'}</h5>
                       <p style={{ margin: 0, color: "#666", fontSize: "13px" }}>SL: {item.quantity} x {formatCurrency(item.price_at_order)}</p>

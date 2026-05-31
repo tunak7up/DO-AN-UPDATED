@@ -1,8 +1,9 @@
+import { API_URL, BASE_URL } from '../api.js';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const API_URL = 'http://localhost:3000/api';
+
 
 function AddProductPage() {
   const [categories, setCategories] = useState([]);

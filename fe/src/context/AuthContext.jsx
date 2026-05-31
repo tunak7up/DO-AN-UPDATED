@@ -1,9 +1,10 @@
+import { API_URL, BASE_URL } from '../api.js';
 import React, { createContext, useState, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext();
-const API_URL = 'http://localhost:3000/api';
+
 
 export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();

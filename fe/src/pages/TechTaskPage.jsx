@@ -1,7 +1,8 @@
+import { API_URL, BASE_URL } from '../api.js';
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const API_URL = "http://localhost:3000/api";
+
 
 // Hàm lấy class CSS cho badge trạng thái
 const getStatusBadgeClass = (status) => {

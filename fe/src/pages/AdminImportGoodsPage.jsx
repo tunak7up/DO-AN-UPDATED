@@ -1,8 +1,9 @@
+import { API_URL, BASE_URL } from '../api.js';
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = "http://localhost:3000/api";
+
 
 function AdminImportGoodsPage() {
   const navigate = useNavigate();
@@ -172,7 +173,7 @@ function AdminImportGoodsPage() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '15px' }}>
                 {filteredProducts.map(p => (
                   <div key={p.id} style={{ border: '1px solid #eee', borderRadius: '8px', padding: '10px', textAlign: 'center', display: 'flex', flexDirection: 'column' }}>
-                    <img src={p.thumbnail?.startsWith('http') ? p.thumbnail : `http://localhost:3000${p.thumbnail}`} alt={p.title} style={{ width: '100%', height: '100px', objectFit: 'contain', marginBottom: '10px' }} />
+                    <img src={p.thumbnail?.startsWith('http') ? p.thumbnail : `${BASE_URL}${p.thumbnail}`} alt={p.title} style={{ width: '100%', height: '100px', objectFit: 'contain', marginBottom: '10px' }} />
                     <h4 style={{ fontSize: '13px', margin: '0 0 10px 0', flex: 1 }}>{p.title}</h4>
                     <button 
                       onClick={() => handleAddToCart(p)}
