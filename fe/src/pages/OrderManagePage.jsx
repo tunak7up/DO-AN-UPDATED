@@ -368,7 +368,13 @@ function OrderManagePage() {
                         alt="sp" 
                         style={{width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px'}}
                       />
-                      <span>{item.product?.title || 'Sản phẩm đã xóa'}</span>
+                      {item.product ? (
+                        <a href={`/product/${item.product.id}`} target="_blank" rel="noopener noreferrer" style={{ color: '#3498db', textDecoration: 'none', fontWeight: '500' }}>
+                          {item.product.title}
+                        </a>
+                      ) : (
+                        <span>Sản phẩm đã xóa</span>
+                      )}
                     </td>
                     <td>{formatCurrency(item.price_at_order)}</td>
                     <td style={{textAlign: 'center'}}>{item.quantity}</td>
