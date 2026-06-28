@@ -44,7 +44,7 @@ function PaymentPage() {
 
     try {
       // Phí ship cố định (hoặc tính toán tùy logic)
-      const shippingFee = 30000;
+      const shippingFee = 0;
       
       // Tổng tiền cuối cùng = Tổng tiền hàng + Phí ship
       // cartTotal lấy từ Context
@@ -116,12 +116,28 @@ function PaymentPage() {
                   <div className="method-info"><div className="method-name">Thanh toán khi nhận hàng (COD)</div></div>
                 </label>
               </div>
-              <div className="payment-method">
-                <input type="radio" id="bankTransfer" name="paymentMethod" value="bank" checked={paymentMethod === 'bank'} onChange={(e) => setPaymentMethod(e.target.value)}/>
-                <label htmlFor="bankTransfer">
-                  <div className="method-icon"><i className="fas fa-university"></i></div>
-                  <div className="method-info"><div className="method-name">Chuyển khoản ngân hàng</div></div>
-                </label>
+              <div style={{ marginBottom: '15px' }}>
+                <div className="payment-method">
+                  <input type="radio" id="bankTransfer" name="paymentMethod" value="bank" checked={paymentMethod === 'bank'} onChange={(e) => setPaymentMethod(e.target.value)}/>
+                  <label htmlFor="bankTransfer">
+                    <div className="method-icon"><i className="fas fa-university"></i></div>
+                    <div className="method-info"><div className="method-name">Chuyển khoản ngân hàng</div></div>
+                  </label>
+                </div>
+                {paymentMethod === 'bank' && (
+                  <div className="bank-transfer-details" style={{ padding: '15px', marginTop: '10px', background: '#f8f9fa', borderRadius: '8px', border: '1px dashed #ced4da' }}>
+                    <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                      <img src="/qr.jpg" alt="QR Code" style={{ width: '250px', height: '250px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #ddd', backgroundColor: '#fff' }} />
+                      <div style={{ flex: 1, minWidth: '200px' }}>
+                        <p style={{ margin: '5px 0', fontSize: '15px' }}><strong>Ngân hàng:</strong> BIDV</p>
+                        <p style={{ margin: '5px 0', fontSize: '15px' }}><strong>Số TK:</strong> 4506484727</p>
+                        <p style={{ margin: '5px 0', fontSize: '15px' }}><strong>Chủ TK:</strong> NGUYEN ANH TUAN</p>
+                        <p style={{ margin: '5px 0', fontSize: '15px', color: '#e74c3c' }}><strong>Số tiền:</strong> {(cartTotal).toLocaleString('vi-VN')} đ</p>
+                        <p style={{ margin: '5px 0', fontSize: '15px' }}><strong>Nội dung:</strong> Thanh toan don hang {user?.username || user?.phone || user?.id || ''}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
