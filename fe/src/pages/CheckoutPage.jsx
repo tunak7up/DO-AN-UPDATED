@@ -13,7 +13,6 @@ function CheckoutPage() {
     city: "",
     district: "",
     note: "",
-    shippingMethod: "standard", // Mặc định chọn giao hàng tiêu chuẩn
   });
 
   // Hàm xử lý khi nhập liệu
@@ -182,57 +181,7 @@ function CheckoutPage() {
                   </div>
                 </div>
 
-                {/* Shipping Method */}
-                <div className="form-section">
-                  <h2 className="section-title">
-                    <i className="fas fa-shipping-fast"></i> Phương thức vận
-                    chuyển
-                  </h2>
 
-                  <div className="shipping-methods">
-                    <div className="shipping-method">
-                      <input
-                        type="radio"
-                        id="standardShipping"
-                        name="shippingMethod"
-                        value="standard"
-                        checked={formData.shippingMethod === "standard"}
-                        onChange={handleChange}
-                      />
-                      <label htmlFor="standardShipping">
-                        <div className="method-info">
-                          <div className="method-name">
-                            Giao hàng tiêu chuẩn
-                          </div>
-                          <div className="method-details">
-                            3-5 ngày làm việc
-                          </div>
-                        </div>
-                        <div className="method-price">30.000đ</div>
-                      </label>
-                    </div>
-
-                    <div className="shipping-method">
-                      <input
-                        type="radio"
-                        id="expressShipping"
-                        name="shippingMethod"
-                        value="express"
-                        checked={formData.shippingMethod === "express"}
-                        onChange={handleChange}
-                      />
-                      <label htmlFor="expressShipping">
-                        <div className="method-info">
-                          <div className="method-name">Giao hàng nhanh</div>
-                          <div className="method-details">
-                            1-2 ngày làm việc
-                          </div>
-                        </div>
-                        <div className="method-price">50.000đ</div>
-                      </label>
-                    </div>
-                  </div>
-                </div>
 
                 <button type="submit" className="checkout-btn">
                   Tiếp tục đến thanh toán

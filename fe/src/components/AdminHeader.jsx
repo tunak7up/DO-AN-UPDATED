@@ -16,7 +16,7 @@ function AdminHeader() {
   const userRole = user?.role || user?.role_name || 'ROLE_ADMIN';
 
   // Điều kiện hiển thị menu
-  const canViewOrders = ['ROLE_ADMIN', 'ROLE_DIRECTOR', 'ROLE_ORDER_MANAGER', 'ROLE_CASHIER'].includes(userRole);
+  const canViewOrders = ['ROLE_ADMIN', 'ROLE_DIRECTOR', 'ROLE_ORDER_MANAGER', 'ROLE_CASHIER', 'ROLE_WAREHOUSE_MANAGER'].includes(userRole);
   const canCreateOrders = ['ROLE_ADMIN', 'ROLE_DIRECTOR', 'ROLE_SALES_STAFF'].includes(userRole);
   const canViewAppointments = ['ROLE_ADMIN', 'ROLE_DIRECTOR', 'ROLE_ORDER_MANAGER', 'ROLE_CASHIER', 'ROLE_TECHNICAL_STAFF'].includes(userRole);
   const canViewInventory = ['ROLE_ADMIN', 'ROLE_DIRECTOR', 'ROLE_WAREHOUSE_MANAGER', 'ROLE_SALES_STAFF'].includes(userRole);

@@ -123,13 +123,6 @@ function PaymentPage() {
                   <div className="method-info"><div className="method-name">Chuyển khoản ngân hàng</div></div>
                 </label>
               </div>
-              <div className="payment-method">
-                <input type="radio" id="momoPayment" name="paymentMethod" value="momo" checked={paymentMethod === 'momo'} onChange={(e) => setPaymentMethod(e.target.value)}/>
-                <label htmlFor="momoPayment">
-                  <div className="method-icon"><i className="fas fa-wallet"></i></div>
-                  <div className="method-info"><div className="method-name">Ví điện tử MoMo</div></div>
-                </label>
-              </div>
             </div>
           </div>
 

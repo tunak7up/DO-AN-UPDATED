@@ -2,6 +2,7 @@ import { API_URL, BASE_URL } from '../api.js';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 
 // Định nghĩa URL API cơ sở của bạn
 
@@ -16,6 +17,7 @@ function Home() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { addToCart } = useCart();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -147,7 +149,7 @@ function Home() {
                       <span>(24)</span>
                     </div>
 
-                    <button className="add-to-cart">Thêm vào giỏ</button>
+                    <button className="add-to-cart" onClick={() => addToCart(product.id, 1)}>Thêm vào giỏ</button>
                   </div>
                 </div>
               );

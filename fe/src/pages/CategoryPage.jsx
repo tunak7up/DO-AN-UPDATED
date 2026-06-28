@@ -2,6 +2,7 @@ import { API_URL, BASE_URL } from '../api.js';
 import React, { useState, useEffect } from "react";
 
 import { Link, useParams, useNavigate } from "react-router-dom";
+import { useCart } from "../context/CartContext";
 import axios from "axios";
 
 
@@ -16,6 +17,7 @@ const formatCurrency = (number) => {
 
 // Component ProductCard (Không thay đổi)
 const ProductCard = ({ product }) => {
+  const { addToCart } = useCart();
   
   const originalPrice = product.price || 0;
   const discountPercent = product.discount || 0;
@@ -47,7 +49,7 @@ const ProductCard = ({ product }) => {
             <span className="old-price">{formatCurrency(originalPrice)}</span>
           )}
         </div>
-        <button className="add-to-cart">Thêm vào giỏ</button>
+        <button className="add-to-cart" onClick={() => addToCart(product.id, 1)}>Thêm vào giỏ</button>
       </div>
     </div>
   );

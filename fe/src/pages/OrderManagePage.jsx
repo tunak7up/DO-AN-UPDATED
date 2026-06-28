@@ -277,7 +277,7 @@ function OrderManagePage() {
                       style={{width: '100%', padding: '8px', marginTop: '5px'}}
                       value={editStatus}
                       onChange={(e) => setEditStatus(e.target.value)}
-                      disabled={userRole === 'ROLE_CASHIER'}
+                      disabled={['ROLE_CASHIER', 'ROLE_WAREHOUSE_MANAGER'].includes(userRole)}
                     >
                       <option value="Pending">Pending (Chờ xử lý)</option>
                       <option value="Processing">Processing (Đang chuẩn bị)</option>
@@ -292,6 +292,7 @@ function OrderManagePage() {
                       style={{width: '100%', padding: '8px', marginTop: '5px'}}
                       value={editPaymentStatus}
                       onChange={(e) => setEditPaymentStatus(e.target.value)}
+                      disabled={userRole === 'ROLE_WAREHOUSE_MANAGER'}
                     >
                       <option value="Unpaid">Unpaid (Chưa thanh toán)</option>
                       <option value="Paid">Paid (Đã thanh toán)</option>
@@ -303,7 +304,7 @@ function OrderManagePage() {
                       style={{width: '100%', padding: '8px', marginTop: '5px'}}
                       value={assigningShipper}
                       onChange={(e) => setAssigningShipper(e.target.value)}
-                      disabled={userRole === 'ROLE_CASHIER'}
+                      disabled={['ROLE_CASHIER', 'ROLE_WAREHOUSE_MANAGER'].includes(userRole)}
                     >
                       <option value="">-- Chưa gán --</option>
                       {shippers.map(shipper => (
@@ -394,7 +395,9 @@ function OrderManagePage() {
 
             <div style={{display: 'flex', justifyContent: 'flex-end', gap: '10px'}}>
               <button onClick={() => setShowModal(false)} className="btn-cancel" style={{padding: '10px 20px'}}>Đóng</button>
-              <button onClick={handleUpdateOrder} className="btn-submit" style={{padding: '10px 20px'}}>Lưu Thay Đổi</button>
+              {userRole !== 'ROLE_WAREHOUSE_MANAGER' && (
+                <button onClick={handleUpdateOrder} className="btn-submit" style={{padding: '10px 20px'}}>Lưu Thay Đổi</button>
+              )}
             </div>
           </div>
         </div>
