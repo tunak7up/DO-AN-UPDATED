@@ -16,6 +16,7 @@ function EditProductPage() {
   const [discount, setDiscount] = useState(0); 
   const [thumbnail, setThumbnail] = useState('');
   const [description, setDescription] = useState('');
+  const [deleted, setDeleted] = useState(0);
 
   // Tải Categories và thông tin Product
   useEffect(() => {
@@ -23,7 +24,7 @@ function EditProductPage() {
       try {
         const [categoryRes, productRes] = await Promise.all([
           axios.get(`${API_URL}/categories`),
-          axios.get(`${API_URL}/products/${productId}`)
+          axios.get(`${API_URL}/products/${productId}?includeDeleted=true`)
         ]);
         
         if (categoryRes.data.success) {
@@ -38,6 +39,7 @@ function EditProductPage() {
           setDiscount(product.discount || 0);
           setThumbnail(product.thumbnail || '');
           setDescription(product.description || '');
+          setDeleted(product.deleted || 0);
         }
       } catch (err) {
         console.error("Lỗi tải dữ liệu:", err);
@@ -74,6 +76,20 @@ function EditProductPage() {
       }
     } catch (err) {
       console.error('Lỗi khi cập nhật sản phẩm:', err);
+      alert('Lỗi: ' + (err.response?.data?.message || err.message));
+    }
+  };
+
+  const handleToggleStatus = async () => {
+    try {
+      const newStatus = deleted === 1 ? 0 : 1;
+      const response = await axios.patch(`${API_URL}/products/${productId}/status`, { deleted: newStatus });
+      if (response.data.success) {
+        setDeleted(newStatus);
+        alert(response.data.message);
+      }
+    } catch (err) {
+      console.error('Lỗi khi cập nhật trạng thái:', err);
       alert('Lỗi: ' + (err.response?.data?.message || err.message));
     }
   };
@@ -167,8 +183,25 @@ function EditProductPage() {
           </div>
         </div>
 
-        <div className="form-actions">
-          <button type="button" className="btn-cancel" onClick={() => navigate('/admin/inventory')}>Hủy bỏ</button>
+        <div className="form-actions" style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '20px' }}>
+          <button 
+            type="button" 
+            onClick={handleToggleStatus}
+            style={{ 
+              padding: '10px 15px', 
+              borderRadius: '4px', 
+              border: 'none', 
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              marginRight: 'auto',
+              backgroundColor: deleted === 1 ? '#28a745' : '#dc3545',
+              color: 'white'
+            }}
+          >
+            {deleted === 1 ? <><i className="fas fa-play"></i> Tiếp tục kinh doanh</> : <><i className="fas fa-pause"></i> Ngừng kinh doanh</>}
+          </button>
+          
+          <button type="button" className="btn-cancel" onClick={() => navigate('/admin/products')}>Hủy bỏ</button>
           <button type="submit" className="btn-submit">Lưu thay đổi</button>
         </div>
       </form>

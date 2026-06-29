@@ -24,11 +24,11 @@ const Product = sequelize.define('Product', {
     allowNull: true
   },
   thumbnail: {
-    type: DataTypes.TEXT('tiny'),
+    type: DataTypes.TEXT,
     allowNull: true
   },
   description: {
-    type: DataTypes.TEXT('tiny'),
+    type: DataTypes.TEXT,
     allowNull: true
   },
   deleted: {

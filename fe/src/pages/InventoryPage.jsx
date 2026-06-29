@@ -3,6 +3,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import EditProductModal from "../components/EditProductModal";
 import AdjustStockModal from "../components/AdjustStockModal";
+import InventoryHistoryModal from "../components/InventoryHistoryModal";
 import { useAuth } from '../context/AuthContext';
 import { Link } from "react-router-dom";
 
@@ -10,7 +11,7 @@ import { Link } from "react-router-dom";
 
 // === Component con: Quản lý 1 dòng sản phẩm ===
 // Tách ra cho dễ quản lý state
-const ProductInventoryRow = ({ product, stores, filterStore, userRole, myStoreIds, onOpenAdjustModal }) => {
+const ProductInventoryRow = ({ product, stores, filterStore, userRole, myStoreIds, onOpenAdjustModal, onOpenHistoryModal }) => {
 
   const getHeaders = () => {
     return { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
@@ -81,6 +82,18 @@ const ProductInventoryRow = ({ product, stores, filterStore, userRole, myStoreId
               <i style={{ color: "red" }} className="fa-solid fa-pen-to-square"></i> Sửa
             </button>
           )}
+          <button
+            className="btn-history"
+            onClick={() => {
+              if (onOpenHistoryModal) {
+                onOpenHistoryModal(product, filterStore);
+              }
+            }}
+            title="Xem lịch sử kho"
+            style={{ background: 'transparent', border: 'none', cursor: 'pointer', marginLeft: '10px' }}
+          >
+            <i style={{ color: "#007bff" }} className="fa-solid fa-clock-rotate-left"></i> Lịch sử
+          </button>
         </div>
       </td>
       <td>
@@ -115,6 +128,7 @@ function InventoryPage() {
   // State cho Adjust Modal
   const [adjustModalData, setAdjustModalData] = useState(null);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [historyModalData, setHistoryModalData] = useState(null);
 
   // Tải tất cả dữ liệu ban đầu
   useEffect(() => {
@@ -167,14 +181,9 @@ function InventoryPage() {
       const matchesCategory =
         filterCategory === "all" || p.category_id === parseInt(filterCategory);
 
-      // 3. Lọc theo store (Sản phẩm có tồn kho > 0 tại store đã chọn)
-      const matchesStore =
-        filterStore === "all" ||
-        p.inventories.some(
-          (inv) => inv.store_id === parseInt(filterStore) && inv.quantity > 0
-        );
-
-      return matchesSearch && matchesCategory && matchesStore;
+      // 3. KHÔNG lọc theo store để các sản phẩm chưa có tồn kho (hoặc bằng 0) vẫn hiển thị
+      // để quản lý kho có thể nhìn thấy và nhập/điều chỉnh.
+      return matchesSearch && matchesCategory;
     });
   }, [products, filterSearch, filterCategory, filterStore]);
 
@@ -345,6 +354,9 @@ function InventoryPage() {
                 onOpenAdjustModal={(product, storeId, currentQuantity) => 
                   setAdjustModalData({ product, storeId, currentQuantity })
                 }
+                onOpenHistoryModal={(product, storeId) => 
+                  setHistoryModalData({ product, storeId })
+                }
                 userRole={userRole}
                 myStoreIds={myStoreIds}
               />
@@ -372,6 +384,15 @@ function InventoryPage() {
           storeId={adjustModalData.storeId}
           currentQuantity={adjustModalData.currentQuantity}
           productName={adjustModalData.product.title}
+        />
+      )}
+
+      {historyModalData && (
+        <InventoryHistoryModal
+          isOpen={true}
+          onClose={() => setHistoryModalData(null)}
+          product={historyModalData.product}
+          storeId={historyModalData.storeId}
         />
       )}
     </div>

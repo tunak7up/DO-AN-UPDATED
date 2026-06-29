@@ -3,8 +3,13 @@ const { sequelize, Product, Category, Gallery, Inventory, Store } = require('../
 // Lấy tất cả sản phẩm
 exports.getAllProducts = async (req, res) => {
   try {
+    const whereCondition = {};
+    if (!req.query.includeDeleted) {
+      whereCondition.deleted = 0;
+    }
+
     const products = await Product.findAll({
-      where: { deleted: 0 },
+      where: whereCondition,
       include: [
         {
           model: Category,
@@ -36,8 +41,13 @@ exports.getAllProducts = async (req, res) => {
 // Lấy sản phẩm theo ID
 exports.getProductById = async (req, res) => {
   try {
+    const whereCondition = { id: req.params.id };
+    if (!req.query.includeDeleted) {
+      whereCondition.deleted = 0;
+    }
+
     const product = await Product.findOne({
-      where: { id: req.params.id, deleted: 0 },
+      where: whereCondition,
       include: [
         {
           model: Category,
@@ -129,7 +139,8 @@ exports.updateProduct = async (req, res) => {
   try {
     const { category_id, title, price, discount, thumbnail, description } = req.body;
     
-    const product = await Product.findOne({ where: { id: req.params.id, deleted: 0 } });
+    // Admin có thể update sản phẩm đã bị xóa mềm, nên bỏ điều kiện deleted: 0
+    const product = await Product.findOne({ where: { id: req.params.id } });
     
     if (!product) {
       return res.status(404).json({ success: false, message: 'Không tìm thấy sản phẩm' });
@@ -154,7 +165,7 @@ exports.updateProduct = async (req, res) => {
 // Xóa mềm sản phẩm
 exports.deleteProduct = async (req, res) => {
   try {
-    const product = await Product.findOne({ where: { id: req.params.id, deleted: 0 } });
+    const product = await Product.findOne({ where: { id: req.params.id } });
     
     if (!product) {
       return res.status(404).json({ success: false, message: 'Không tìm thấy sản phẩm' });
@@ -163,6 +174,25 @@ exports.deleteProduct = async (req, res) => {
     await product.update({ deleted: 1, updated_at: new Date() });
     
     res.json({ success: true, message: 'Xóa sản phẩm thành công' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Đổi trạng thái kinh doanh của sản phẩm
+exports.toggleProductStatus = async (req, res) => {
+  try {
+    const { deleted } = req.body; // 0 hoặc 1
+    
+    const product = await Product.findOne({ where: { id: req.params.id } });
+    
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy sản phẩm' });
+    }
+    
+    await product.update({ deleted: deleted, updated_at: new Date() });
+    
+    res.json({ success: true, message: 'Cập nhật trạng thái kinh doanh thành công', data: product });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

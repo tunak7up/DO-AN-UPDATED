@@ -20,7 +20,7 @@ function ProductManagePage() {
     try {
       setLoading(true);
       const [res, categoryRes] = await Promise.all([
-        axios.get(`${API_URL}/products`),
+        axios.get(`${API_URL}/products?includeDeleted=true`),
         axios.get(`${API_URL}/categories`)
       ]);
       if (res.data.success) {

@@ -29,12 +29,17 @@ function AdminLoginPage() {
         const adminRoles = [
           'ROLE_ADMIN', 'ROLE_DIRECTOR', 'ROLE_CASHIER', 
           'ROLE_WAREHOUSE_MANAGER', 'ROLE_ORDER_MANAGER', 
-          'ROLE_TECHNICAL_STAFF', 'ROLE_SALES_STAFF', 'ROLE_CUSTOMER_SERVICE'
+          'ROLE_TECHNICAL_STAFF', 'ROLE_SALES_STAFF', 'ROLE_CUSTOMER_SERVICE', 'ROLE_SHIPPER'
         ];
         
         if (storedUser && (adminRoles.includes(storedUser.role_name) || adminRoles.includes(storedUser.role))) {
           // Đúng là Nhân sự / Admin -> Vào trang quản trị
-          navigate('/admin'); 
+          const role = storedUser.role_name || storedUser.role;
+          if (role === 'ROLE_SHIPPER') {
+            navigate('/admin/shipper');
+          } else {
+            navigate('/admin'); 
+          }
         } else {
           // Không phải Admin/Staff -> Đăng xuất ngay lập tức và báo lỗi
           logout(); 
