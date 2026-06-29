@@ -15,6 +15,15 @@ exports.register = async (req, res) => {
         .json({ success: false, message: "Email đã được sử dụng" });
     }
 
+    if (phone) {
+      const existingPhone = await User.findOne({ where: { phone } });
+      if (existingPhone) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Số điện thoại đã tồn tại" });
+      }
+    }
+
     // 2. Hash mật khẩu MD5
     const hashedPassword = crypto
       .createHash("md5")

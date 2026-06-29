@@ -15,6 +15,9 @@ function CheckoutPage() {
     note: "",
   });
 
+  const [locations, setLocations] = useState([]);
+  const [selectedCityCode, setSelectedCityCode] = useState("");
+
   // Hàm xử lý khi nhập liệu
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,7 +25,20 @@ function CheckoutPage() {
       ...prev,
       [name]: value,
     }));
+
+    // Nếu thay đổi Tỉnh/TP thì reset Quận/Huyện
+    if (name === "city") {
+      setFormData((prev) => ({ ...prev, district: "" }));
+      setSelectedCityCode(e.target.options[e.target.selectedIndex].dataset.code || "");
+    }
   };
+
+  React.useEffect(() => {
+    fetch('/vn_only_simplified_json_generated_data_vn_units.json')
+      .then(res => res.json())
+      .then(data => setLocations(data))
+      .catch(err => console.error("Error loading locations:", err));
+  }, []);
 
   // Hàm xử lý khi submit form
   const handleSubmit = (e) => {
@@ -143,10 +159,12 @@ function CheckoutPage() {
                         value={formData.city}
                         onChange={handleChange}
                       >
-                        <option value="">Chọn Tỉnh/TP</option>
-                        <option value="hcm">TP. Hồ Chí Minh</option>
-                        <option value="hn">Hà Nội</option>
-                        <option value="dn">Đà Nẵng</option>
+                        <option value="" data-code="">Chọn Tỉnh/TP</option>
+                        {locations.map((loc) => (
+                          <option key={loc.Code} value={loc.FullName} data-code={loc.Code}>
+                            {loc.FullName}
+                          </option>
+                        ))}
                       </select>
                     </div>
 
@@ -160,10 +178,17 @@ function CheckoutPage() {
                         required
                         value={formData.district}
                         onChange={handleChange}
+                        disabled={!selectedCityCode}
                       >
                         <option value="">Chọn Quận/Huyện</option>
-                        <option value="q1">Quận 1</option>
-                        <option value="q2">Quận 2</option>
+                        {selectedCityCode &&
+                          locations
+                            .find((loc) => loc.Code === selectedCityCode)
+                            ?.Wards?.map((ward) => (
+                              <option key={ward.Code} value={ward.FullName}>
+                                {ward.FullName}
+                              </option>
+                            ))}
                       </select>
                     </div>
                   </div>

@@ -76,7 +76,7 @@ exports.getUserById = async (req, res) => {
 // Tạo người dùng mới
 exports.createUser = async (req, res) => {
   try {
-    const { name, email, password, phone, address } = req.body;
+    const { name, email, password, phone, address, role_id } = req.body;
 
     // Hash mật khẩu bằng MD5 (giống database)
     const hashedPassword = crypto
@@ -95,6 +95,14 @@ exports.createUser = async (req, res) => {
       created_at: new Date(),
       updated_at: new Date(),
     });
+
+    if (role_id) {
+      const roleId = parseInt(role_id);
+      const role = await Role.findByPk(roleId);
+      if (role) {
+        await user.setRoles([role]);
+      }
+    }
 
     res.status(201).json({ success: true, data: user });
   } catch (error) {

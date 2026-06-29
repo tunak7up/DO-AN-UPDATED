@@ -267,6 +267,7 @@ function OrderManagePage() {
                   <p><strong>SĐT:</strong> {selectedOrder.shipping_phone}</p>
                   <p><strong>Địa chỉ:</strong> {selectedOrder.shipping_address}</p>
                   <p><strong>Khu vực:</strong> {selectedOrder.shipping_district}, {selectedOrder.shipping_city}</p>
+                  <p><strong>Phương thức TT:</strong> {selectedOrder.payment_method === 'cod' ? 'Thanh toán khi nhận hàng (COD)' : 'Chuyển khoản'}</p>
                   <p><strong>Ghi chú:</strong> {selectedOrder.notes || 'Không có'}</p>
                 </div>
               </div>

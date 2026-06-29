@@ -2,14 +2,15 @@ import { API_URL, BASE_URL } from '../api.js';
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import EditUserModal from "../components/EditUserModal";
-
-
+import AddUserModal from "../components/AddUserModal";
 
 function UserManagePage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingUser, setEditingUser] = useState(null);
+  const [isAddingUser, setIsAddingUser] = useState(false);
   const [filterSearch, setFilterSearch] = useState("");
+  const [activeTab, setActiveTab] = useState("Staff"); // "Staff" or "Customer"
 
   useEffect(() => {
     fetchUsers();
@@ -56,12 +57,17 @@ function UserManagePage() {
     }
   };
 
-  // Filter users
-  const filteredUsers = users.filter(
-    (user) =>
+  // Filter users by tab and search
+  const filteredUsers = users.filter((user) => {
+    const isCustomer = user.roles && user.roles.some((r) => r.name === "ROLE_USER");
+    if (activeTab === "Staff" && isCustomer) return false;
+    if (activeTab === "Customer" && !isCustomer) return false;
+
+    const searchMatch =
       user.name?.toLowerCase().includes(filterSearch.toLowerCase()) ||
-      user.email?.toLowerCase().includes(filterSearch.toLowerCase())
-  );
+      user.email?.toLowerCase().includes(filterSearch.toLowerCase());
+    return searchMatch;
+  });
 
   return (
     <div className="container">
@@ -69,7 +75,7 @@ function UserManagePage() {
         <h1>
           <i className="fas fa-users-cog"></i> Quản Lý Phân Quyền Nhân Viên
         </h1>
-        <div className="header-actions">
+        <div className="header-actions" style={{ display: "flex", gap: "15px", alignItems: "center" }}>
           <div className="search-box">
             <input
               type="text"
@@ -81,7 +87,48 @@ function UserManagePage() {
               <i className="fas fa-search"></i>
             </button>
           </div>
+          <button 
+            className="btn-add" 
+            onClick={() => setIsAddingUser(true)}
+            style={{ padding: "8px 15px", background: "#27ae60", color: "#fff", border: "none", borderRadius: "5px", cursor: "pointer", fontWeight: "bold" }}
+          >
+            <i className="fas fa-plus"></i> Tạo nhân viên mới
+          </button>
         </div>
+      </div>
+
+      {/* Tabs */}
+      <div style={{ display: "flex", gap: "20px", marginBottom: "20px", borderBottom: "2px solid #eee" }}>
+        <button
+          onClick={() => setActiveTab("Staff")}
+          style={{
+            padding: "10px 20px",
+            background: "none",
+            border: "none",
+            borderBottom: activeTab === "Staff" ? "3px solid #3498db" : "3px solid transparent",
+            color: activeTab === "Staff" ? "#3498db" : "#666",
+            fontWeight: "bold",
+            cursor: "pointer",
+            fontSize: "15px"
+          }}
+        >
+          Nhân viên
+        </button>
+        <button
+          onClick={() => setActiveTab("Customer")}
+          style={{
+            padding: "10px 20px",
+            background: "none",
+            border: "none",
+            borderBottom: activeTab === "Customer" ? "3px solid #3498db" : "3px solid transparent",
+            color: activeTab === "Customer" ? "#3498db" : "#666",
+            fontWeight: "bold",
+            cursor: "pointer",
+            fontSize: "15px"
+          }}
+        >
+          Khách hàng
+        </button>
       </div>
 
       <div className="table-container">
@@ -147,6 +194,15 @@ function UserManagePage() {
         isOpen={!!editingUser}
         onClose={() => setEditingUser(null)}
         onSave={handleSaveUser}
+      />
+
+      <AddUserModal
+        isOpen={isAddingUser}
+        onClose={() => setIsAddingUser(false)}
+        onSuccess={() => {
+          setIsAddingUser(false);
+          fetchUsers();
+        }}
       />
     </div>
   );

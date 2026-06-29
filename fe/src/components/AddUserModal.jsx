@@ -1,68 +1,31 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import axios from "axios";
+import { API_URL } from "../api";
 
 const ROLES = [
   { id: 2, name: "ROLE_CASHIER", desc: "Phụ trách thanh toán và hóa đơn" },
-  {
-    id: 3,
-    name: "ROLE_WAREHOUSE_MANAGER",
-    desc: "Quản lý hàng tồn kho và nhập xuất",
-  },
-  {
-    id: 5,
-    name: "ROLE_TECHNICAL_STAFF",
-    desc: "Xử lý kỹ thuật và bảo trì thiết bị",
-  },
+  { id: 3, name: "ROLE_WAREHOUSE_MANAGER", desc: "Quản lý hàng tồn kho và nhập xuất" },
+  { id: 5, name: "ROLE_TECHNICAL_STAFF", desc: "Xử lý kỹ thuật và bảo trì thiết bị" },
   { id: 6, name: "ROLE_SHIPPER", desc: "Giao hàng đến khách" },
   { id: 7, name: "ROLE_SALES_STAFF", desc: "Tư vấn và bán sản phẩm cho khách" },
-  {
-    id: 8,
-    name: "ROLE_CUSTOMER_SERVICE",
-    desc: "Nhân viên chăm sóc khách hàng",
-  },
+  { id: 8, name: "ROLE_CUSTOMER_SERVICE", desc: "Nhân viên chăm sóc khách hàng" },
   { id: 9, name: "ROLE_ADMIN", desc: "Quản trị hệ thống toàn quyền" },
-  {
-    id: 10,
-    name: "ROLE_DIRECTOR",
-    desc: "Quản lý toàn bộ hoạt động kinh doanh",
-  },
-  {
-    id: 11,
-    name: "ROLE_USER",
-    desc: "Vai trò mặc định cho khách hàng",
-  },
-  {
-    id: 12,
-    name: "ROLE_ORDER_MANAGER",
-    desc: "Người phụ trách quản lý đơn hàng chuyên sâu",
-  },
+  { id: 10, name: "ROLE_DIRECTOR", desc: "Quản lý toàn bộ hoạt động kinh doanh" },
+  { id: 12, name: "ROLE_ORDER_MANAGER", desc: "Người phụ trách quản lý đơn hàng chuyên sâu" },
 ];
 
-const EditUserModal = ({ user, isOpen, onClose, onSave }) => {
+const AddUserModal = ({ isOpen, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    password: "",
     phone: "",
     address: "",
-    role_id: "",
+    role_id: 9, // Default to ADMIN
   });
-
-  useEffect(() => {
-    if (user) {
-      setFormData({
-        name: user.name || "",
-        email: user.email || "",
-        phone: user.phone || "",
-        address: user.address || "",
-        // Lấy role đầu tiên nếu có, hoặc mặc định
-        role_id: user.roles && user.roles.length > 0 ? user.roles[0].id : 11,
-      });
-    }
-  }, [user]);
+  const [loading, setLoading] = useState(false);
 
   if (!isOpen) return null;
-
-  const isCustomer = user?.roles?.some((r) => r.name === "ROLE_USER");
-  const displayRoles = isCustomer ? ROLES : ROLES.filter((r) => r.name !== "ROLE_USER");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -72,20 +35,41 @@ const EditUserModal = ({ user, isOpen, onClose, onSave }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSave({
-      ...user, // Giữ lại id
-      ...formData,
-    });
+    if (!formData.name || !formData.email || !formData.password) {
+      alert("Vui lòng điền đầy đủ tên, email và mật khẩu.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const res = await axios.post(`${API_URL}/users`, formData);
+      if (res.data.success) {
+        alert("Tạo nhân viên thành công!");
+        setFormData({
+          name: "",
+          email: "",
+          password: "",
+          phone: "",
+          address: "",
+          role_id: 9,
+        });
+        onSuccess();
+      }
+    } catch (error) {
+      alert("Lỗi tạo nhân viên: " + (error.response?.data?.message || error.message));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="modal-overlay">
       <div className="modal-content">
         <div className="modal-header">
-          <h2>Phân quyền / Sửa thông tin</h2>
-          <button className="close-btn" onClick={onClose}>
+          <h2>Tạo nhân viên mới</h2>
+          <button className="close-btn" onClick={onClose} disabled={loading}>
             &times;
           </button>
         </div>
@@ -111,6 +95,17 @@ const EditUserModal = ({ user, isOpen, onClose, onSave }) => {
               required
             />
           </div>
+          
+          <div className="form-group">
+            <label>Mật khẩu:</label>
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
           <div className="form-group">
             <label>Vai trò (Role):</label>
@@ -119,9 +114,8 @@ const EditUserModal = ({ user, isOpen, onClose, onSave }) => {
               value={formData.role_id}
               onChange={handleChange}
               style={{ width: "100%", padding: "8px", borderRadius: "4px" }}
-              disabled={isCustomer}
             >
-              {displayRoles.map((role) => (
+              {ROLES.map((role) => (
                 <option key={role.id} value={role.id}>
                   {role.name} - {role.desc}
                 </option>
@@ -150,11 +144,11 @@ const EditUserModal = ({ user, isOpen, onClose, onSave }) => {
           </div>
 
           <div className="modal-actions">
-            <button type="button" className="btn-cancel" onClick={onClose}>
+            <button type="button" className="btn-cancel" onClick={onClose} disabled={loading}>
               Hủy
             </button>
-            <button type="submit" className="btn-save">
-              Lưu thay đổi
+            <button type="submit" className="btn-save" disabled={loading}>
+              {loading ? "Đang tạo..." : "Tạo nhân viên"}
             </button>
           </div>
         </form>
@@ -163,4 +157,4 @@ const EditUserModal = ({ user, isOpen, onClose, onSave }) => {
   );
 };
 
-export default EditUserModal;
+export default AddUserModal;

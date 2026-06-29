@@ -106,17 +106,18 @@ button:focus-visible {
   font-size: 1.5rem;
 }
 
-.btn-close {
-  background: none;
-  border: none;
+.btn-close, .close-btn {
+  background: transparent !important;
+  border: none !important;
   font-size: 24px;
   color: #aaa;
   cursor: pointer;
-  padding: 0;
+  padding: 0 !important;
+  line-height: 1;
 }
 
-.btn-close:hover {
-  color: #fff;
+.btn-close:hover, .close-btn:hover {
+  color: #ff4d4f;
 }
 
 .form-group {

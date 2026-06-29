@@ -38,9 +38,9 @@ function Footer() {
           <div className="footer-col">
             <h3>Liên hệ</h3>
             <ul>
-              <li><i className="fas fa-map-marker-alt"></i> 123 Đường ABC, Quận 1, TP.HCM</li>
-              <li><i className="fas fa-phone"></i> 1900 1234</li>
-              <li><i className="fas fa-envelope"></i> info@techzone.vng</li>
+              <li><i className="fas fa-map-marker-alt"></i> Số 1 Đại Cồ Việt, phường Bạch Mai, quận Hai Bà Trưng, thành phố Hà Nội.</li>
+              <li><i className="fas fa-phone"></i> 0987962495</li>
+              <li><i className="fas fa-envelope"></i> tuan.na225772@sis.hust.edu.vn</li>
             </ul>
           </div>
         </div>
