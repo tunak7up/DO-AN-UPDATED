@@ -22,7 +22,7 @@ const AppointmentHistory = require("./AppointmentHistory");
 const ImportReceipt = require("./ImportReceipt");
 const ImportReceiptDetail = require("./ImportReceiptDetail");
 const StockAdjustment = require("./StockAdjustment");
-const ShippingLog = require("./ShippingLog");
+
 
 // Định nghĩa quan hệ giữa các model
 
@@ -88,9 +88,6 @@ Order.belongsTo(User, { foreignKey: "user_id", as: "user" });
 User.hasMany(Order, { foreignKey: "shipper_id", as: "shippingOrders" });
 Order.belongsTo(User, { foreignKey: "shipper_id", as: "shipper" });
 
-// Order - ShippingLog
-Order.hasMany(ShippingLog, { foreignKey: "order_id", as: "shippingLogs" });
-ShippingLog.belongsTo(Order, { foreignKey: "order_id", as: "order" });
 
 // Order - OrderItem - Product
 Order.hasMany(OrderItem, { foreignKey: "order_id", as: "items" });
@@ -244,6 +241,5 @@ module.exports = {
   ImportReceipt,
   ImportReceiptDetail,
   StockAdjustment,
-  ShippingLog,
   syncDatabase,
 };

@@ -1,4 +1,4 @@
-const { Order, OrderItem, Product, User, ShippingLog } = require('../models');
+const { Order, OrderItem, Product, User, OrderHistory } = require('../models');
 
 // Lấy danh sách đơn hàng được gán cho Shipper
 exports.getMyAssignedOrders = async (req, res) => {
@@ -14,8 +14,9 @@ exports.getMyAssignedOrders = async (req, res) => {
           include: [{ model: Product, as: "product", attributes: ["id", "title", "thumbnail"] }],
         },
         {
-          model: ShippingLog,
-          as: "shippingLogs",
+          model: OrderHistory,
+          as: "histories",
+          include: [{ model: User, as: "changer", attributes: ["id", "name"] }],
           order: [["created_at", "DESC"]],
         }
       ],
@@ -47,6 +48,10 @@ exports.updateShippingStatus = async (req, res) => {
       return res.status(404).json({ success: false, message: "Không tìm thấy đơn hàng hoặc bạn không được phân công giao đơn này." });
     }
 
+    // Lưu lại trạng thái cũ
+    let oldStatus = order.status;
+    let oldPaymentStatus = order.payment_status;
+
     // Cập nhật trạng thái tổng của đơn hàng tùy theo hành động
     let newStatus = order.status;
     let newPaymentStatus = order.payment_status;
@@ -65,12 +70,15 @@ exports.updateShippingStatus = async (req, res) => {
 
     await order.update({ status: newStatus, payment_status: newPaymentStatus });
 
-    // Lưu log shipping
-    const log = await ShippingLog.create({
+    // Lưu vết Lịch sử vào OrderHistory (thay cho ShippingLog cũ)
+    const log = await OrderHistory.create({
       order_id: order.id,
-      action: action,
-      note: note || '',
-      created_at: new Date()
+      changed_by_user_id: shipperId,
+      old_status: oldStatus,
+      new_status: newStatus,
+      old_payment_status: oldPaymentStatus,
+      new_payment_status: newPaymentStatus,
+      note: note ? `[${action}] ${note}` : `[${action}]`
     });
 
     res.json({ success: true, message: "Cập nhật trạng thái giao hàng thành công.", data: log });

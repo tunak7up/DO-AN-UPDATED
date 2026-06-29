@@ -119,8 +119,17 @@ function OrderManagePage() {
       }
       
       alert("Cập nhật đơn hàng thành công!");
-      setShowModal(false);
       fetchOrders(); // Tải lại danh sách
+      
+      // Tải lại lịch sử để cập nhật modal
+      try {
+        const res = await axios.get(`${API_URL}/orders/${selectedOrder.id}/history`, getHeaders());
+        if (res.data.success) {
+          setOrderHistories(res.data.data);
+        }
+      } catch(err) {
+        console.log('Lỗi lấy lịch sử:', err);
+      }
     } catch (error) {
       alert("Lỗi cập nhật: " + error.message);
     }
@@ -131,11 +140,8 @@ function OrderManagePage() {
     filterStatus === "All" ? true : order.status === filterStatus
   );
 
-  // Tạo combinedHistories gộp cả OrderHistory và ShippingLog
-  const combinedHistories = [
-    ...orderHistories.map(h => ({ ...h, type: 'status' })),
-    ...(selectedOrder?.shippingLogs || []).map(s => ({ ...s, type: 'shipping' }))
-  ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  // Sử dụng trực tiếp OrderHistory
+  const combinedHistories = [...orderHistories].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
   return (
     <div className="container">
@@ -328,19 +334,13 @@ function OrderManagePage() {
                   {combinedHistories.map((h, i) => (
                      <li key={i} style={{marginBottom: '10px', borderBottom: '1px solid #eee', paddingBottom: '5px'}}>
                        <strong>{new Date(h.created_at).toLocaleString('vi-VN')}</strong> - 
-                       {h.type === 'status' ? (
-                         <>
-                           <span style={{color: '#0056b3'}}> {h.changer?.name || 'Ai đó'}</span> thay đổi: <br/>
-                           {h.old_status !== h.new_status && `Trạng thái: ${h.old_status || 'Trống'} ➡️ ${h.new_status} `}
-                           {h.old_payment_status !== h.new_payment_status && `| Thanh toán: ${h.old_payment_status || 'Trống'} ➡️ ${h.new_payment_status} `}
-                           {h.old_shipper_id !== h.new_shipper_id && `| Shipper: ${h.old_shipper?.name || 'Chưa gán'} ➡️ ${h.new_shipper?.name || 'Chưa gán'}`}
-                         </>
-                       ) : (
-                         <>
-                           <span style={{color: '#e67e22'}}> Shipper</span> cập nhật: <br/>
-                           Hành động: <strong>{h.action}</strong> {h.note && `| Ghi chú: ${h.note}`}
-                         </>
-                       )}
+                       <>
+                         <span style={{color: '#0056b3'}}> {h.changer?.name || 'Hệ thống'}</span> cập nhật: <br/>
+                         {h.old_status !== h.new_status && `Trạng thái: ${h.old_status || 'Trống'} ➡️ ${h.new_status} `}
+                         {h.old_payment_status !== h.new_payment_status && `| Thanh toán: ${h.old_payment_status || 'Trống'} ➡️ ${h.new_payment_status} `}
+                         {h.old_shipper_id !== h.new_shipper_id && `| Shipper: ${h.old_shipper?.name || 'Chưa gán'} ➡️ ${h.new_shipper?.name || 'Chưa gán'} `}
+                         {h.note && <div><strong>Ghi chú:</strong> {h.note}</div>}
+                       </>
                      </li>
                   ))}
                 </ul>

@@ -1,4 +1,4 @@
-const { sequelize, Order, OrderItem, Product, Cart, CartItem, User, OrderHistory, ShippingLog } = require('../models');
+const { sequelize, Order, OrderItem, Product, Cart, CartItem, User, OrderHistory } = require('../models');
 
 // Lấy tất cả đơn hàng
 exports.getAllOrders = async (req, res) => {
@@ -51,8 +51,9 @@ exports.getOrderById = async (req, res) => {
           attributes: ["id", "name", "email", "phone"],
         },
         {
-          model: ShippingLog,
-          as: "shippingLogs",
+          model: OrderHistory,
+          as: "histories",
+          include: [{ model: User, as: "changer", attributes: ["id", "name"] }],
           order: [["created_at", "DESC"]],
         },
         {
@@ -117,10 +118,6 @@ exports.createOrder = async (req, res) => {
         price_at_order: price, // Lưu giá tại thời điểm mua
       });
     }
-
-    // Cộng thêm phí ship (ví dụ cố định 30k, hoặc lấy từ FE nếu logic phức tạp)
-    const shipping_fee = 30000;
-    total_amount += shipping_fee;
 
     // 2. Tạo Order (Map từ shipping_info sang các cột của bảng orders)
     const order = await Order.create(
@@ -335,15 +332,7 @@ exports.assignShipper = async (req, res) => {
       old_payment_status: order.payment_status,
       new_payment_status: order.payment_status,
       old_shipper_id: old_shipper_id || null,
-      new_shipper_id: shipper_id || null,
-    });
-
-    // Tạo lịch sử shipping action assigned
-    await ShippingLog.create({
-      order_id: order.id,
-      action: 'assigned',
-      note: `Gán đơn hàng cho shipper ID: ${shipper_id} bởi Admin/Manager ID: ${req.user.id}`,
-      created_at: new Date()
+      new_shipper_id: shipper_id || null
     });
 
     res.json({ success: true, message: "Gán shipper thành công", data: order });

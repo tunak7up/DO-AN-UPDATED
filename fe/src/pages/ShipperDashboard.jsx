@@ -32,7 +32,7 @@ function ShipperDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("Assigned");
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [note, setNote] = useState("");
+  const [actionNotes, setActionNotes] = useState({});
 
   const { user } = useAuth();
 
@@ -77,7 +77,7 @@ function ShipperDashboard() {
       if (res.data.success) {
         alert("Cập nhật trạng thái thành công!");
         setSelectedOrder(null);
-        setNote("");
+        setActionNotes(prev => ({...prev, [orderId]: ""}));
         fetchMyOrders();
       }
     } catch (err) {
@@ -91,20 +91,11 @@ function ShipperDashboard() {
       return orders.filter((o) => o.status === "Processing");
     }
     if (activeTab === "Shipping") {
-      return orders.filter(
-        (o) =>
-          o.status === "Shipping" ||
-          (o.shippingLogs && o.shippingLogs[0]?.action === "picked_up"),
-      );
+      return orders.filter((o) => o.status === "Shipping");
     }
     if (activeTab === "History") {
       return orders.filter(
-        (o) =>
-          o.status === "Completed" ||
-          o.status === "Cancelled" ||
-          (o.shippingLogs &&
-            (o.shippingLogs[0]?.action === "delivered" ||
-              o.shippingLogs[0]?.action === "failed")),
+        (o) => o.status === "Completed" || o.status === "Cancelled"
       );
     }
     return orders;
@@ -236,7 +227,7 @@ function ShipperDashboard() {
                   <strong>
                     <i className="fas fa-user"></i> Khách hàng:
                   </strong>{" "}
-                  {order.customer_name} ({order.customer_phone})
+                  {order.receiver_name} - SĐT: {order.shipping_phone}
                 </p>
                 <p>
                   <strong>
@@ -249,11 +240,7 @@ function ShipperDashboard() {
                     <i className="fas fa-money-bill-wave"></i> Thu tiền (COD):
                   </strong>{" "}
                   <span style={{ color: "red", fontWeight: "bold" }}>
-                    {order.payment_status === "Paid" ||
-                    order.payment_status === "paid" ||
-                    order.payment_method !== "cod"
-                      ? "0 ₫ "
-                      : formatCurrency(order.total_amount)}
+                    {order.payment_method === 'cod' ? formatCurrency(order.total_amount) : '0 ₫'}
                   </span>
                 </p>
                 {order.notes && (
@@ -282,14 +269,35 @@ function ShipperDashboard() {
                 >
                   <i className="fas fa-info-circle"></i> Chi tiết
                 </button>
+              </div>
 
+              {/* Nhập ghi chú trước khi thao tác */}
+              {(activeTab === "Assigned" || activeTab === "Shipping") && (
+                <div style={{ marginTop: "15px", marginBottom: "10px" }}>
+                  <input
+                    type="text"
+                    placeholder="Ghi chú (tùy chọn, vd: Hẹn giao mai)..."
+                    value={actionNotes[order.id] || ""}
+                    onChange={(e) => setActionNotes(prev => ({...prev, [order.id]: e.target.value}))}
+                    style={{
+                      width: "100%",
+                      padding: "10px",
+                      borderRadius: "6px",
+                      border: "1px solid #ccc"
+                    }}
+                  />
+                </div>
+              )}
+
+              {/* Nút hành động */}
+              <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "10px" }}>
                 {activeTab === "Assigned" && (
                   <button
                     onClick={() =>
                       handleUpdateStatus(
                         order.id,
                         "picked_up",
-                        "Đã lấy hàng từ kho",
+                        actionNotes[order.id] || "Đã lấy hàng từ kho"
                       )
                     }
                     style={{
@@ -313,7 +321,7 @@ function ShipperDashboard() {
                       handleUpdateStatus(
                         order.id,
                         "delivered",
-                        "Giao hàng thành công",
+                        actionNotes[order.id] || "Giao hàng thành công"
                       )
                     }
                     style={{
@@ -334,11 +342,10 @@ function ShipperDashboard() {
                 {activeTab === "Shipping" && (
                   <button
                     onClick={() => {
-                      const reason = window.prompt(
-                        "Nhập lý do giao thất bại (VD: Khách không nghe máy):",
+                      const reason = actionNotes[order.id] || window.prompt(
+                        "Nhập lý do giao thất bại (VD: Khách không nghe máy):"
                       );
-                      if (reason)
-                        handleUpdateStatus(order.id, "failed", reason);
+                      if (reason) handleUpdateStatus(order.id, "failed", reason);
                     }}
                     style={{
                       flex: 1,
@@ -431,30 +438,27 @@ function ShipperDashboard() {
                   ))}
               </ul>
 
-              {selectedOrder.shippingLogs &&
-                selectedOrder.shippingLogs.length > 0 && (
-                  <div style={{ marginTop: "20px" }}>
-                    <h4 style={{ fontSize: "15px", marginBottom: "10px" }}>
-                      Lịch sử vận chuyển
-                    </h4>
-                    <ul
-                      style={{
-                        paddingLeft: "15px",
-                        fontSize: "13px",
-                        color: "#555",
-                      }}
-                    >
-                      {selectedOrder.shippingLogs.map((log) => (
-                        <li key={log.id} style={{ marginBottom: "8px" }}>
-                          <strong>
-                            {new Date(log.created_at).toLocaleString("vi-VN")}
-                          </strong>
-                          : [{log.action}] {log.note}
-                        </li>
-                      ))}
-                    </ul>
+              <div style={{ marginTop: "20px", borderTop: "1px solid #ddd", paddingTop: "15px" }}>
+                <h4 style={{ fontSize: "15px", marginBottom: "10px" }}>Thông tin giao hàng</h4>
+                <p style={{ margin: "5px 0", fontSize: "14px" }}><strong>Người nhận:</strong> {selectedOrder.receiver_name}</p>
+                <p style={{ margin: "5px 0", fontSize: "14px" }}><strong>SĐT:</strong> {selectedOrder.shipping_phone}</p>
+                <p style={{ margin: "5px 0", fontSize: "14px" }}><strong>Địa chỉ:</strong> {selectedOrder.shipping_address}, {selectedOrder.shipping_district}, {selectedOrder.shipping_city}</p>
+                {selectedOrder.notes && (
+                  <p style={{ margin: "5px 0", fontSize: "14px", color: "#e67e22" }}><strong>Ghi chú đơn:</strong> {selectedOrder.notes}</p>
+                )}
+                
+                <p style={{ margin: "15px 0 5px 0", fontSize: "14px" }}><strong>Phương thức thanh toán:</strong> {selectedOrder.payment_method === 'cod' ? 'Thanh toán khi nhận hàng (COD)' : 'Chuyển khoản'}</p>
+                <p style={{ margin: "5px 0", fontSize: "14px" }}><strong>Trạng thái TT:</strong> <span style={{color: selectedOrder.payment_status === 'Paid' ? '#27ae60' : '#e74c3c', fontWeight: 'bold'}}>{selectedOrder.payment_status}</span></p>
+                
+                {selectedOrder.payment_method === 'cod' && selectedOrder.payment_status !== 'Paid' && (
+                  <div style={{ marginTop: "15px", padding: "10px", backgroundColor: "#fff3cd", color: "#856404", borderRadius: "5px", border: "1px solid #ffeeba" }}>
+                    <strong>Số tiền cần thu hộ (COD): </strong>
+                    <span style={{ fontSize: "16px", fontWeight: "bold", color: "#d35400" }}>
+                      {formatCurrency(selectedOrder.total_amount)}
+                    </span>
                   </div>
                 )}
+              </div>
             </div>
           </div>
         </div>

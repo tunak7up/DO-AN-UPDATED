@@ -41,6 +41,10 @@ const OrderHistory = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: true,
     },
+    note: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
