@@ -14,6 +14,9 @@ function AdminCreateOrderPage() {
   // POS Cart State
   const [cartItems, setCartItems] = useState([]);
 
+  const [locations, setLocations] = useState([]);
+  const [selectedCityCode, setSelectedCityCode] = useState("");
+
   // Form Data (Bỏ qua email và phương thức vận chuyển)
   const [formData, setFormData] = useState({
     fullName: "Khách lẻ",
@@ -29,6 +32,10 @@ function AdminCreateOrderPage() {
 
   useEffect(() => {
     fetchProducts();
+    fetch('/vn_only_simplified_json_generated_data_vn_units.json')
+      .then(res => res.json())
+      .then(data => setLocations(data))
+      .catch(err => console.error("Error loading locations:", err));
   }, []);
 
   const fetchProducts = async () => {
@@ -92,6 +99,11 @@ function AdminCreateOrderPage() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+
+    if (name === "city") {
+      setFormData((prev) => ({ ...prev, district: "" }));
+      setSelectedCityCode(e.target.options[e.target.selectedIndex].dataset.code || "");
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -258,19 +270,27 @@ function AdminCreateOrderPage() {
               <div className="form-group" style={{ flex: 1 }}>
                 <label>Tỉnh/Thành phố</label>
                 <select name="city" value={formData.city} onChange={handleChange} style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '4px' }}>
-                  <option value="">Chọn Tỉnh/TP</option>
-                  <option value="hcm">TP. Hồ Chí Minh</option>
-                  <option value="hn">Hà Nội</option>
-                  <option value="dn">Đà Nẵng</option>
+                  <option value="" data-code="">Chọn Tỉnh/TP</option>
+                  {locations.map((loc) => (
+                    <option key={loc.Code} value={loc.FullName} data-code={loc.Code}>
+                      {loc.FullName}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               <div className="form-group" style={{ flex: 1 }}>
                 <label>Quận/Huyện</label>
-                <select name="district" value={formData.district} onChange={handleChange} style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '4px' }}>
+                <select name="district" value={formData.district} onChange={handleChange} style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '4px' }} disabled={!selectedCityCode}>
                   <option value="">Chọn Quận/Huyện</option>
-                  <option value="q1">Quận 1</option>
-                  <option value="q2">Quận 2</option>
+                  {selectedCityCode &&
+                    locations
+                      .find((loc) => loc.Code === selectedCityCode)
+                      ?.Wards?.map((ward) => (
+                        <option key={ward.Code} value={ward.FullName}>
+                          {ward.FullName}
+                        </option>
+                      ))}
                 </select>
               </div>
             </div>
