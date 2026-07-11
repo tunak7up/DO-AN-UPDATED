@@ -1,4 +1,5 @@
 const { User, Role } = require("../models");
+const { Op } = require("sequelize");
 const crypto = require("crypto");
 
 // Lấy tất cả người dùng
@@ -33,15 +34,17 @@ exports.getShippers = async (req, res) => {
           as: "roles",
           where: { name: "ROLE_SHIPPER" },
           attributes: [],
-          through: { attributes: [] }
-        }
+          through: { attributes: [] },
+        },
       ],
-      attributes: ["id", "name", "email", "phone"]
+      attributes: ["id", "name", "email", "phone"],
     });
     res.json({ success: true, data: shippers });
   } catch (error) {
     console.error("Lỗi lấy danh sách shipper:", error);
-    res.status(500).json({ success: false, message: "Lỗi lấy danh sách người giao hàng." });
+    res
+      .status(500)
+      .json({ success: false, message: "Lỗi lấy danh sách người giao hàng." });
   }
 };
 
@@ -123,6 +126,21 @@ exports.updateUser = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "Không tìm thấy người dùng" });
+    }
+
+    if (phone) {
+      const phoneExists = await User.findOne({
+        where: {
+          phone,
+          id: { [Op.ne]: req.params.id },
+          deleted: 0,
+        },
+      });
+      if (phoneExists) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Số điện thoại đã tồn tại" });
+      }
     }
 
     await user.update({

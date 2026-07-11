@@ -53,7 +53,7 @@ function AdminAccountPage() {
         localStorage.setItem('user', JSON.stringify(updatedUser));
       }
     } catch (error) {
-      alert("Lỗi cập nhật: " + error.message);
+      alert("Lỗi cập nhật: " + (error.response?.data?.message || error.message));
     }
   };
 
