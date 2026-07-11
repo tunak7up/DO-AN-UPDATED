@@ -1,6 +1,6 @@
 import React from "react";
 // === MỚI: Thêm 'Outlet' ===
-import { Routes, Route, Outlet } from "react-router-dom";
+import { Routes, Route, Outlet, Navigate } from "react-router-dom";
 
 // Layouts & Pages
 import Header from "./components/Header";
@@ -37,6 +37,8 @@ import RegisterPage from "./pages/RegisterPage";
 import AccountPage from "./pages/AccountPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
 import UserManagePage from "./pages/UserManagePage";
+import AdminRoute from "./components/AdminRoute";
+import AdminIndexRedirect from "./components/AdminIndexRedirect";
 
 import "./App.css";
 
@@ -95,22 +97,24 @@ function App() {
         </Route>
 
         {/* === CÁC ROUTE ADMIN (dùng AdminLayout) === */}
-        <Route path="/admin" element={<AdminLayout />}>
-          {/* <Route index element={<AdminDashboard />} /> {/* Trang chủ admin */}
-          <Route path="account" element={<AdminAccountPage />} />
-          <Route path="inventory" element={<InventoryPage />} />
-          <Route path="products" element={<ProductManagePage />} />
-          <Route path="products/new" element={<AddProductPage />} />
-          <Route path="products/edit/:productId" element={<EditProductPage />} />
-          <Route path="services" element={<ServiceListPage />} />
-          <Route path="services/new" element={<AddServicePage />} />
-          <Route path="appointments" element={<AppointmentManagePage />} />
-          <Route path="users" element={<UserManagePage />} />
-          <Route path="store-users" element={<StoreUserManagePage />} />
-          <Route path="orders" element={<OrderManagePage />} />
-          <Route path="create-order" element={<AdminCreateOrderPage />} />
-          <Route path="import" element={<AdminImportGoodsPage />} />
-          <Route path="shipper" element={<ShipperDashboard />} />
+        <Route path="/admin" element={<AdminRoute />}>
+          <Route element={<AdminLayout />}>
+            <Route index element={<AdminIndexRedirect />} />
+            <Route path="account" element={<AdminAccountPage />} />
+            <Route path="inventory" element={<InventoryPage />} />
+            <Route path="products" element={<ProductManagePage />} />
+            <Route path="products/new" element={<AddProductPage />} />
+            <Route path="products/edit/:productId" element={<EditProductPage />} />
+            <Route path="services" element={<ServiceListPage />} />
+            <Route path="services/new" element={<AddServicePage />} />
+            <Route path="appointments" element={<AppointmentManagePage />} />
+            <Route path="users" element={<UserManagePage />} />
+            <Route path="store-users" element={<StoreUserManagePage />} />
+            <Route path="orders" element={<OrderManagePage />} />
+            <Route path="create-order" element={<AdminCreateOrderPage />} />
+            <Route path="import" element={<AdminImportGoodsPage />} />
+            <Route path="shipper" element={<ShipperDashboard />} />
+          </Route>
         </Route>
       </Routes>
     </div>
