@@ -20,14 +20,15 @@ function LoginPage() {
       const result = await login(email, password);
 
       if (result.success) {
-        const role = result.user.role_name || result.user.role;
-        if (role === "ROLE_SHIPPER") {
-          navigate("/admin/shipper");
-        } else if (role && role !== "ROLE_USER") {
-          navigate("/admin/");
-        } else {
-          navigate("/");
-        }
+        // const role = result.user.role_name || result.user.role;
+        // if (role === "ROLE_SHIPPER") {
+        //   navigate("/admin/shipper");
+        // } else if (role && role !== "ROLE_USER") {
+        //   navigate("/admin/");
+        // } else {
+        // navigate("/");
+        // }
+        navigate("/");
       } else {
         setError(result.message);
       }

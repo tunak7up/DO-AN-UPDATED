@@ -1,11 +1,9 @@
-import { API_URL, BASE_URL } from '../api.js';
+import { API_URL, BASE_URL } from "../api.js";
 import React, { useState, useEffect } from "react";
 
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import axios from "axios";
-
-
 
 // Hàm trợ giúp định dạng tiền tệ
 const formatCurrency = (number) => {
@@ -18,7 +16,7 @@ const formatCurrency = (number) => {
 // Component ProductCard (Không thay đổi)
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
-  
+
   const originalPrice = product.price || 0;
   const discountPercent = product.discount || 0;
   const currentPrice = originalPrice * (1 - discountPercent / 100);
@@ -49,7 +47,12 @@ const ProductCard = ({ product }) => {
             <span className="old-price">{formatCurrency(originalPrice)}</span>
           )}
         </div>
-        <button className="add-to-cart" onClick={() => addToCart(product.id, 1)}>Thêm vào giỏ</button>
+        <button
+          className="add-to-cart"
+          onClick={() => addToCart(product.id, 1)}
+        >
+          Thêm vào giỏ
+        </button>
       </div>
     </div>
   );
@@ -62,7 +65,6 @@ function CategoryPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Thêm state để lưu danh sách categories cho select bar ===
   const [allCategories, setAllCategories] = useState([]);
 
   const { categoryId } = useParams();
@@ -75,7 +77,7 @@ function CategoryPage() {
   const filteredProducts = products.filter(
     (product) =>
       product.title &&
-      product.title.toLowerCase().includes(searchTerm.toLowerCase())
+      product.title.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   // Thêm useEffect để tải TẤT CẢ categories cho select bar ===
@@ -121,7 +123,7 @@ function CategoryPage() {
             // Trường hợp categoryId có nhưng không tìm thấy sản phẩm
             // tìm tên category từ list đã tải
             const currentCat = allCategories.find(
-              (cat) => cat.id.toString() === categoryId
+              (cat) => cat.id.toString() === categoryId,
             );
             setCategoryName(currentCat ? currentCat.name : "Danh mục");
           }
@@ -134,7 +136,6 @@ function CategoryPage() {
       }
     };
 
-    // Chỉ chạy fetchProducts khi allCategories đã được tải (tránh race condition)
     if (allCategories.length > 0 || !categoryId) {
       fetchProducts();
     }

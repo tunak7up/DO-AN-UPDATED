@@ -20,7 +20,7 @@ function Header() {
         <div className="navbar">
           <div className="logo">
             <Link to="/">
-              <i className="fas fa-laptop-code"></i> Tech<span>Zone</span>
+              <i className="fas fa-laptop-code"></i> Tech<span>Shop</span>
             </Link>
           </div>
           <nav className="nav-links">
@@ -34,21 +34,42 @@ function Header() {
             {user ? (
               // Nếu ĐÃ đăng nhập: Hiện tên user + Nút đăng xuất
               <>
-                <Link to="/account" title="Thông tin tài khoản" style={{ marginRight: '10px' }}>
+                <Link
+                  to="/account"
+                  title="Thông tin tài khoản"
+                  style={{ marginRight: "10px" }}
+                >
                   <i className="fa-solid fa-id-card"></i>
-                  <span className="hide-on-mobile" style={{ marginLeft: '5px', fontWeight: 'bold' }}>{user.name}</span>
+                  <span
+                    className="hide-on-mobile"
+                    style={{ marginLeft: "5px", fontWeight: "bold" }}
+                  >
+                    {user.name}
+                  </span>
                 </Link>
-                <button 
-                  onClick={handleLogout} 
+                <button
+                  onClick={handleLogout}
                   title="Đăng xuất"
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '20px', color: '#f8f1f1ff', marginRight: '15px', transform: 'translateY(0)' }}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    fontSize: "20px",
+                    color: "#f8f1f1ff",
+                    marginRight: "15px",
+                    transform: "translateY(0)",
+                  }}
                 >
                   <i className="fa-solid fa-arrow-right-from-bracket"></i>
                 </button>
               </>
             ) : (
               // Nếu CHƯA đăng nhập: Hiện nút Login
-              <Link to="/login" title="Đăng nhập" style={{ marginRight: '15px' }}>
+              <Link
+                to="/login"
+                title="Đăng nhập"
+                style={{ marginRight: "15px" }}
+              >
                 <i className="fa-solid fa-arrow-right-to-bracket"></i>
               </Link>
             )}

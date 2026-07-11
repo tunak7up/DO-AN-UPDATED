@@ -44,7 +44,7 @@ exports.register = async (req, res) => {
     });
 
     // 4. Lấy ID của ROLE_USER thay vì hardcode
-    const defaultRole = await Role.findOne({ where: { name: 'ROLE_USER' } });
+    const defaultRole = await Role.findOne({ where: { name: "ROLE_USER" } });
     if (defaultRole) {
       await UserRole.create({
         user_id: newUser.id,
@@ -71,8 +71,8 @@ exports.login = async (req, res) => {
       include: [
         {
           model: Role,
-          as: "roles", // Phải khớp với quan hệ trong models/index.js
-          through: { attributes: [] }, // Bỏ qua bảng trung gian
+          as: "roles",
+          through: { attributes: [] },
         },
       ],
     });
@@ -106,7 +106,7 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       { id: user.id, email: user.email, role: mainRole },
       secretKey,
-      { expiresIn: "24h" }
+      { expiresIn: "24h" },
     );
 
     // Chuẩn bị data trả về

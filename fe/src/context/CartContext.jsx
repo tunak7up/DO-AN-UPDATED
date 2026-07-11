@@ -1,14 +1,12 @@
-import { API_URL, BASE_URL } from '../api.js';
+import { API_URL, BASE_URL } from "../api.js";
 import React, { createContext, useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useAuth } from "./AuthContext";
 
 const CartContext = createContext();
 
-const USER_ID = 1; // Hardcode userId vì chưa có login
-
 export const CartProvider = ({ children }) => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [cart, setCart] = useState(null);
   const [totalItems, setTotalItems] = useState(0);
   const [cartTotal, setCartTotal] = useState(0);
@@ -46,9 +44,10 @@ export const CartProvider = ({ children }) => {
 
   // Lấy giỏ hàng từ API
   const fetchCart = async () => {
-    if (!user) return; // Bảo vệ
+    if (!user) return;
     try {
-      const res = await axios.get(`${API_URL}/cart/user/${user.id}`); // Dùng user.id động
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const res = await axios.get(`${API_URL}/cart/user/${user.id}`, config);
       if (res.data.success) {
         setCart(res.data.data);
         calculateTotals(res.data.data);
@@ -69,11 +68,16 @@ export const CartProvider = ({ children }) => {
       return;
     }
     try {
-      const res = await axios.post(`${API_URL}/cart/add`, {
-        user_id: user.id, // Dùng user.id động
-        product_id: productId,
-        quantity: quantity,
-      });
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const res = await axios.post(
+        `${API_URL}/cart/add`,
+        {
+          user_id: user.id, // Dùng user.id động
+          product_id: productId,
+          quantity: quantity,
+        },
+        config,
+      );
       if (res.data.success) {
         setCart(res.data.data);
         calculateTotals(res.data.data);
@@ -87,10 +91,15 @@ export const CartProvider = ({ children }) => {
   // Cập nhật số lượng item
   const updateQuantity = async (itemId, newQuantity) => {
     try {
-      // Optimistic update (Cập nhật giao diện trước khi gọi API để mượt hơn)
-      const res = await axios.put(`${API_URL}/cart/item/${itemId}`, {
-        quantity: newQuantity,
-      });
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      // Cập nhật giao diện trước khi gọi API để mượt hơn
+      const res = await axios.put(
+        `${API_URL}/cart/item/${itemId}`,
+        {
+          quantity: newQuantity,
+        },
+        config,
+      );
 
       if (res.data.success) {
         fetchCart(); // Tải lại giỏ để đồng bộ chuẩn xác
@@ -104,7 +113,8 @@ export const CartProvider = ({ children }) => {
   const removeFromCart = async (itemId) => {
     if (!window.confirm("Bạn muốn xóa sản phẩm này?")) return;
     try {
-      await axios.delete(`${API_URL}/cart/item/${itemId}`);
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      await axios.delete(`${API_URL}/cart/item/${itemId}`, config);
       fetchCart();
     } catch (error) {
       console.error("Lỗi xóa sản phẩm:", error);

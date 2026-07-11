@@ -4,7 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 function CheckoutPage() {
   const navigate = useNavigate();
 
-  // State lưu trữ dữ liệu form
+  // state lưu trữ dữ liệu form
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
@@ -29,15 +29,17 @@ function CheckoutPage() {
     // Nếu thay đổi Tỉnh/TP thì reset Quận/Huyện
     if (name === "city") {
       setFormData((prev) => ({ ...prev, district: "" }));
-      setSelectedCityCode(e.target.options[e.target.selectedIndex].dataset.code || "");
+      setSelectedCityCode(
+        e.target.options[e.target.selectedIndex].dataset.code || "",
+      );
     }
   };
 
   React.useEffect(() => {
-    fetch('/vn_only_simplified_json_generated_data_vn_units.json')
-      .then(res => res.json())
-      .then(data => setLocations(data))
-      .catch(err => console.error("Error loading locations:", err));
+    fetch("/vn_only_simplified_json_generated_data_vn_units.json")
+      .then((res) => res.json())
+      .then((data) => setLocations(data))
+      .catch((err) => console.error("Error loading locations:", err));
   }, []);
 
   // Hàm xử lý khi submit form
@@ -159,9 +161,15 @@ function CheckoutPage() {
                         value={formData.city}
                         onChange={handleChange}
                       >
-                        <option value="" data-code="">Chọn Tỉnh/TP</option>
+                        <option value="" data-code="">
+                          Chọn Tỉnh/TP
+                        </option>
                         {locations.map((loc) => (
-                          <option key={loc.Code} value={loc.FullName} data-code={loc.Code}>
+                          <option
+                            key={loc.Code}
+                            value={loc.FullName}
+                            data-code={loc.Code}
+                          >
                             {loc.FullName}
                           </option>
                         ))}
@@ -205,8 +213,6 @@ function CheckoutPage() {
                     ></textarea>
                   </div>
                 </div>
-
-
 
                 <button type="submit" className="checkout-btn">
                   Tiếp tục đến thanh toán
