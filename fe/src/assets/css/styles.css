@@ -2414,6 +2414,11 @@
   color: #842029;
 }
 
+.status-badge.not-delivered {
+  background-color: #e2e3e5;
+  color: #41464b;
+}
+
 .action-buttons {
   display: flex;
   gap: 8px;
@@ -4659,4 +4664,40 @@ textarea {
     width: 100%;
     padding: 20px;
   }
+}
+
+/* CSS cho Inventory Table */
+.inventory-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.inventory-table th,
+.inventory-table td {
+  padding: 15px;
+  vertical-align: middle;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.inventory-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #495057;
+  text-align: left;
+}
+
+/* Căn giữa các cột 3 (Số lượng), 4 (Trạng thái), 5 (Thao tác) */
+.inventory-table th:nth-child(3),
+.inventory-table td:nth-child(3),
+.inventory-table th:nth-child(4),
+.inventory-table td:nth-child(4),
+.inventory-table th:nth-child(5),
+.inventory-table td:nth-child(5) {
+  text-align: center;
+}
+
+/* Flexbox trong cột số lượng cũng cần được căn giữa */
+.inventory-table td:nth-child(3) .stock-quantity {
+  justify-content: center;
 }

@@ -15,4 +15,7 @@ router.put('/quick-update/:productId/:storeId', protect, authorizeRoles('ROLE_DI
 // GET /api/inventory/history/:productId - Lấy lịch sử cập nhật tồn kho
 router.get('/history/:productId', protect, authorizeRoles(...INV_ROLES), inventoryController.getProductInventoryHistory);
 
+// POST /api/inventory/transfer/:productId - Điều chuyển tồn kho
+router.post('/transfer/:productId', protect, authorizeRoles('ROLE_DIRECTOR', 'ROLE_WAREHOUSE_MANAGER', 'ROLE_ADMIN'), inventoryController.transferStock);
+
 module.exports = router;

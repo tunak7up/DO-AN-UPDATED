@@ -21,6 +21,7 @@ const getStatusBadgeClass = (status) => {
     case "Completed":
       return "status-badge completed";
     case "Cancelled":
+    case "Not_Delivered":
       return "status-badge cancelled";
     default:
       return "status-badge";
@@ -33,8 +34,25 @@ function ShipperDashboard() {
   const [activeTab, setActiveTab] = useState("Assigned");
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [actionNotes, setActionNotes] = useState({});
+  const [reasonModal, setReasonModal] = useState({ isOpen: false, orderId: null, action: null });
+  const [selectedReason, setSelectedReason] = useState("");
+  const [customReason, setCustomReason] = useState("");
 
   const { user } = useAuth();
+
+  const FAILED_REASONS = [
+    "Khách không lấy đơn nữa",
+    "Sai thông tin giao hàng",
+    "Khách hàng từ chối nhận",
+    "Khác"
+  ];
+
+  const NOT_DELIVERED_REASONS = [
+    "Khách không nghe máy",
+    "Khách hẹn giao ngày khác",
+    "Không tìm thấy địa chỉ",
+    "Khác"
+  ];
 
   const getHeaders = () => {
     return {
@@ -77,7 +95,7 @@ function ShipperDashboard() {
       if (res.data.success) {
         alert("Cập nhật trạng thái thành công!");
         setSelectedOrder(null);
-        setActionNotes(prev => ({...prev, [orderId]: ""}));
+        setActionNotes((prev) => ({ ...prev, [orderId]: "" }));
         fetchMyOrders();
       }
     } catch (err) {
@@ -95,7 +113,7 @@ function ShipperDashboard() {
     }
     if (activeTab === "History") {
       return orders.filter(
-        (o) => o.status === "Completed" || o.status === "Cancelled"
+        (o) => o.status === "Completed" || o.status === "Cancelled" || o.status === "Not_Delivered",
       );
     }
     return orders;
@@ -240,7 +258,9 @@ function ShipperDashboard() {
                     <i className="fas fa-money-bill-wave"></i> Thu tiền (COD):
                   </strong>{" "}
                   <span style={{ color: "red", fontWeight: "bold" }}>
-                    {order.payment_method === 'cod' ? formatCurrency(order.total_amount) : '0 ₫'}
+                    {order.payment_method === "cod"
+                      ? formatCurrency(order.total_amount)
+                      : "0 ₫"}
                   </span>
                 </p>
                 {order.notes && (
@@ -278,26 +298,38 @@ function ShipperDashboard() {
                     type="text"
                     placeholder="Ghi chú (tùy chọn, vd: Hẹn giao mai)..."
                     value={actionNotes[order.id] || ""}
-                    onChange={(e) => setActionNotes(prev => ({...prev, [order.id]: e.target.value}))}
+                    onChange={(e) =>
+                      setActionNotes((prev) => ({
+                        ...prev,
+                        [order.id]: e.target.value,
+                      }))
+                    }
                     style={{
                       width: "100%",
                       padding: "10px",
                       borderRadius: "6px",
-                      border: "1px solid #ccc"
+                      border: "1px solid #ccc",
                     }}
                   />
                 </div>
               )}
 
               {/* Nút hành động */}
-              <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "10px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "10px",
+                  flexWrap: "wrap",
+                  marginTop: "10px",
+                }}
+              >
                 {activeTab === "Assigned" && (
                   <button
                     onClick={() =>
                       handleUpdateStatus(
                         order.id,
                         "picked_up",
-                        actionNotes[order.id] || "Đã lấy hàng từ kho"
+                        actionNotes[order.id] || "Đã lấy hàng từ kho",
                       )
                     }
                     style={{
@@ -321,11 +353,11 @@ function ShipperDashboard() {
                       handleUpdateStatus(
                         order.id,
                         "delivered",
-                        actionNotes[order.id] || "Giao hàng thành công"
+                        actionNotes[order.id] || "Giao hàng thành công",
                       )
                     }
                     style={{
-                      flex: 2,
+                      flex: 1,
                       padding: "10px",
                       background: "#27ae60",
                       color: "white",
@@ -342,10 +374,13 @@ function ShipperDashboard() {
                 {activeTab === "Shipping" && (
                   <button
                     onClick={() => {
-                      const reason = actionNotes[order.id] || window.prompt(
-                        "Nhập lý do giao thất bại (VD: Khách không nghe máy):"
-                      );
-                      if (reason) handleUpdateStatus(order.id, "failed", reason);
+                      if (actionNotes[order.id]) {
+                        handleUpdateStatus(order.id, "failed", actionNotes[order.id]);
+                      } else {
+                        setReasonModal({ isOpen: true, orderId: order.id, action: "failed" });
+                        setSelectedReason("");
+                        setCustomReason("");
+                      }
                     }}
                     style={{
                       flex: 1,
@@ -358,7 +393,33 @@ function ShipperDashboard() {
                       fontWeight: "bold",
                     }}
                   >
-                    <i className="fas fa-times-circle"></i> Thất bại
+                    <i className="fas fa-times-circle"></i> Hủy đơn
+                  </button>
+                )}
+
+                {activeTab === "Shipping" && (
+                  <button
+                    onClick={() => {
+                      if (actionNotes[order.id]) {
+                        handleUpdateStatus(order.id, "notdelivered", actionNotes[order.id]);
+                      } else {
+                        setReasonModal({ isOpen: true, orderId: order.id, action: "notdelivered" });
+                        setSelectedReason("");
+                        setCustomReason("");
+                      }
+                    }}
+                    style={{
+                      flex: 1,
+                      padding: "10px",
+                      background: "#eedf17ff",
+                      color: "#333",
+                      border: "none",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    <i className="fas fa-times-circle"></i> Giao thất bại
                   </button>
                 )}
               </div>
@@ -366,6 +427,76 @@ function ShipperDashboard() {
           ))
         )}
       </div>
+
+      {/* Modal chọn lý do */}
+      {reasonModal.isOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: "400px", width: "95%", margin: "0 auto", padding: "20px" }}>
+            <div className="modal-header">
+              <h3>{reasonModal.action === "failed" ? "Lý do hủy đơn" : "Lý do giao thất bại"}</h3>
+              <button className="close-btn" onClick={() => setReasonModal({ isOpen: false, orderId: null, action: null })}>&times;</button>
+            </div>
+            <div style={{ marginTop: "15px" }}>
+              {(reasonModal.action === "failed" ? FAILED_REASONS : NOT_DELIVERED_REASONS).map((reason, index) => (
+                <div key={index} style={{ marginBottom: "10px" }}>
+                  <label style={{ display: "flex", alignItems: "center", cursor: "pointer" }}>
+                    <input
+                      type="radio"
+                      name="reason"
+                      value={reason}
+                      checked={selectedReason === reason}
+                      onChange={(e) => {
+                        setSelectedReason(e.target.value);
+                        if (e.target.value !== "Khác") {
+                          setCustomReason("");
+                        }
+                      }}
+                      style={{ marginRight: "10px" }}
+                    />
+                    {reason}
+                  </label>
+                </div>
+              ))}
+              
+              {selectedReason === "Khác" && (
+                <div style={{ marginTop: "10px" }}>
+                  <input
+                    type="text"
+                    placeholder="Nhập lý do khác..."
+                    value={customReason}
+                    onChange={(e) => setCustomReason(e.target.value)}
+                    style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid #ccc" }}
+                    autoFocus
+                  />
+                </div>
+              )}
+            </div>
+            
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "20px" }}>
+              <button
+                onClick={() => setReasonModal({ isOpen: false, orderId: null, action: null })}
+                style={{ padding: "8px 15px", borderRadius: "6px", border: "1px solid #ccc", background: "#f8f9fa", cursor: "pointer" }}
+              >
+                Đóng
+              </button>
+              <button
+                onClick={() => {
+                  const finalReason = selectedReason === "Khác" ? customReason : selectedReason;
+                  if (!finalReason.trim()) {
+                    alert("Vui lòng chọn hoặc nhập lý do!");
+                    return;
+                  }
+                  handleUpdateStatus(reasonModal.orderId, reasonModal.action, finalReason);
+                  setReasonModal({ isOpen: false, orderId: null, action: null });
+                }}
+                style={{ padding: "8px 15px", borderRadius: "6px", border: "none", background: reasonModal.action === "failed" ? "#e74c3c" : "#eedf17", color: reasonModal.action === "failed" ? "white" : "#333", cursor: "pointer", fontWeight: "bold" }}
+              >
+                Xác nhận
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal chi tiết đơn hàng */}
       {selectedOrder && (
@@ -438,26 +569,84 @@ function ShipperDashboard() {
                   ))}
               </ul>
 
-              <div style={{ marginTop: "20px", borderTop: "1px solid #ddd", paddingTop: "15px" }}>
-                <h4 style={{ fontSize: "15px", marginBottom: "10px" }}>Thông tin giao hàng</h4>
-                <p style={{ margin: "5px 0", fontSize: "14px" }}><strong>Người nhận:</strong> {selectedOrder.receiver_name}</p>
-                <p style={{ margin: "5px 0", fontSize: "14px" }}><strong>SĐT:</strong> {selectedOrder.shipping_phone}</p>
-                <p style={{ margin: "5px 0", fontSize: "14px" }}><strong>Địa chỉ:</strong> {selectedOrder.shipping_address}, {selectedOrder.shipping_district}, {selectedOrder.shipping_city}</p>
+              <div
+                style={{
+                  marginTop: "20px",
+                  borderTop: "1px solid #ddd",
+                  paddingTop: "15px",
+                }}
+              >
+                <h4 style={{ fontSize: "15px", marginBottom: "10px" }}>
+                  Thông tin giao hàng
+                </h4>
+                <p style={{ margin: "5px 0", fontSize: "14px" }}>
+                  <strong>Người nhận:</strong> {selectedOrder.receiver_name}
+                </p>
+                <p style={{ margin: "5px 0", fontSize: "14px" }}>
+                  <strong>SĐT:</strong> {selectedOrder.shipping_phone}
+                </p>
+                <p style={{ margin: "5px 0", fontSize: "14px" }}>
+                  <strong>Địa chỉ:</strong> {selectedOrder.shipping_address},{" "}
+                  {selectedOrder.shipping_district},{" "}
+                  {selectedOrder.shipping_city}
+                </p>
                 {selectedOrder.notes && (
-                  <p style={{ margin: "5px 0", fontSize: "14px", color: "#e67e22" }}><strong>Ghi chú đơn:</strong> {selectedOrder.notes}</p>
+                  <p
+                    style={{
+                      margin: "5px 0",
+                      fontSize: "14px",
+                      color: "#e67e22",
+                    }}
+                  >
+                    <strong>Ghi chú đơn:</strong> {selectedOrder.notes}
+                  </p>
                 )}
-                
-                <p style={{ margin: "15px 0 5px 0", fontSize: "14px" }}><strong>Phương thức thanh toán:</strong> {selectedOrder.payment_method === 'cod' ? 'Thanh toán khi nhận hàng (COD)' : 'Chuyển khoản'}</p>
-                <p style={{ margin: "5px 0", fontSize: "14px" }}><strong>Trạng thái TT:</strong> <span style={{color: selectedOrder.payment_status === 'Paid' ? '#27ae60' : '#e74c3c', fontWeight: 'bold'}}>{selectedOrder.payment_status}</span></p>
-                
-                {selectedOrder.payment_method === 'cod' && selectedOrder.payment_status !== 'Paid' && (
-                  <div style={{ marginTop: "15px", padding: "10px", backgroundColor: "#fff3cd", color: "#856404", borderRadius: "5px", border: "1px solid #ffeeba" }}>
-                    <strong>Số tiền cần thu hộ (COD): </strong>
-                    <span style={{ fontSize: "16px", fontWeight: "bold", color: "#d35400" }}>
-                      {formatCurrency(selectedOrder.total_amount)}
-                    </span>
-                  </div>
-                )}
+
+                <p style={{ margin: "15px 0 5px 0", fontSize: "14px" }}>
+                  <strong>Phương thức thanh toán:</strong>{" "}
+                  {selectedOrder.payment_method === "cod"
+                    ? "Thanh toán khi nhận hàng (COD)"
+                    : "Chuyển khoản"}
+                </p>
+                <p style={{ margin: "5px 0", fontSize: "14px" }}>
+                  <strong>Trạng thái TT:</strong>{" "}
+                  <span
+                    style={{
+                      color:
+                        selectedOrder.payment_status === "Paid"
+                          ? "#27ae60"
+                          : "#e74c3c",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {selectedOrder.payment_status}
+                  </span>
+                </p>
+
+                {selectedOrder.payment_method === "cod" &&
+                  selectedOrder.payment_status !== "Paid" && (
+                    <div
+                      style={{
+                        marginTop: "15px",
+                        padding: "10px",
+                        backgroundColor: "#fff3cd",
+                        color: "#856404",
+                        borderRadius: "5px",
+                        border: "1px solid #ffeeba",
+                      }}
+                    >
+                      <strong>Số tiền cần thu hộ (COD): </strong>
+                      <span
+                        style={{
+                          fontSize: "16px",
+                          fontWeight: "bold",
+                          color: "#d35400",
+                        }}
+                      >
+                        {formatCurrency(selectedOrder.total_amount)}
+                      </span>
+                    </div>
+                  )}
               </div>
             </div>
           </div>

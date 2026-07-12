@@ -4,6 +4,7 @@ import axios from "axios";
 import EditProductModal from "../components/EditProductModal";
 import AdjustStockModal from "../components/AdjustStockModal";
 import InventoryHistoryModal from "../components/InventoryHistoryModal";
+import TransferStockModal from "../components/TransferStockModal";
 import { useAuth } from '../context/AuthContext';
 import { Link } from "react-router-dom";
 
@@ -11,7 +12,7 @@ import { Link } from "react-router-dom";
 
 // === Component con: Quản lý 1 dòng sản phẩm ===
 // Tách ra cho dễ quản lý state
-const ProductInventoryRow = ({ product, stores, filterStore, userRole, myStoreIds, onOpenAdjustModal, onOpenHistoryModal }) => {
+const ProductInventoryRow = ({ product, stores, filterStore, userRole, myStoreIds, onOpenAdjustModal, onOpenHistoryModal, onOpenTransferModal }) => {
 
   const getHeaders = () => {
     return { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
@@ -99,11 +100,17 @@ const ProductInventoryRow = ({ product, stores, filterStore, userRole, myStoreId
       <td>
         <span className={`status-badge ${status.class}`}>{status.text}</span>
       </td>
-      {/* <td>
-        <button className="btn-transfer">
-          <i className="fas fa-exchange-alt"></i> Điều chuyển
-        </button>
-      </td> */}
+      <td>
+        {userRole !== 'ROLE_TECHNICAL_STAFF' && userRole !== 'ROLE_CASHIER' && (
+          <button 
+            className="btn-transfer" 
+            onClick={() => onOpenTransferModal && onOpenTransferModal(product)}
+            style={{ padding: '6px 10px', background: '#f39c12', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+          >
+            <i className="fas fa-exchange-alt"></i> Điều chuyển
+          </button>
+        )}
+      </td>
     </tr>
   );
 };
@@ -129,6 +136,56 @@ function InventoryPage() {
   const [adjustModalData, setAdjustModalData] = useState(null);
   const [editingProduct, setEditingProduct] = useState(null);
   const [historyModalData, setHistoryModalData] = useState(null);
+  const [transferModalData, setTransferModalData] = useState(null);
+
+  const handleTransferSubmit = async (fromStoreId, toStoreId, quantity, reason) => {
+    try {
+      const token = localStorage.getItem('token');
+      const productId = transferModalData.id;
+      
+      const res = await axios.post(
+        `${API_URL}/inventory/transfer/${productId}`,
+        { from_store_id: fromStoreId, to_store_id: toStoreId, quantity: parseInt(quantity), reason },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // Cập nhật local state
+      setProducts((prevProducts) =>
+        prevProducts.map((p) => {
+          if (p.id === productId) {
+            let newInventories = p.inventories.map(inv => {
+                if (inv.store_id === parseInt(fromStoreId)) {
+                    return { ...inv, quantity: inv.quantity - parseInt(quantity) };
+                }
+                if (inv.store_id === parseInt(toStoreId)) {
+                    return { ...inv, quantity: inv.quantity + parseInt(quantity) };
+                }
+                return inv;
+            });
+
+            // Nếu kho đích chưa có tồn kho cho sản phẩm này
+            const toIdx = newInventories.findIndex(i => i.store_id === parseInt(toStoreId));
+            if (toIdx === -1) {
+              newInventories.push({
+                product_id: productId,
+                store_id: parseInt(toStoreId),
+                quantity: parseInt(quantity),
+              });
+            }
+
+            return { ...p, inventories: newInventories };
+          }
+          return p;
+        })
+      );
+
+      alert("Điều chuyển thành công!");
+      setTransferModalData(null);
+    } catch (err) {
+      console.error("Lỗi điều chuyển kho:", err);
+      alert("Lỗi khi điều chuyển: " + (err.response?.data?.message || err.message));
+    }
+  };
 
   // Tải tất cả dữ liệu ban đầu
   useEffect(() => {
@@ -340,7 +397,7 @@ function InventoryPage() {
               <th>Sản phẩm</th>
               <th>Số lượng</th>
               <th>Trạng thái</th>
-              {/* <th>Thao tác</th> */}
+              <th>Thao tác</th>
             </tr>
           </thead>
           <tbody>
@@ -357,6 +414,7 @@ function InventoryPage() {
                 onOpenHistoryModal={(product, storeId) => 
                   setHistoryModalData({ product, storeId })
                 }
+                onOpenTransferModal={(product) => setTransferModalData(product)}
                 userRole={userRole}
                 myStoreIds={myStoreIds}
               />
@@ -393,6 +451,18 @@ function InventoryPage() {
           onClose={() => setHistoryModalData(null)}
           product={historyModalData.product}
           storeId={historyModalData.storeId}
+        />
+      )}
+
+      {transferModalData && (
+        <TransferStockModal
+          isOpen={true}
+          onClose={() => setTransferModalData(null)}
+          onSave={handleTransferSubmit}
+          stores={stores}
+          product={transferModalData}
+          myStoreIds={myStoreIds}
+          userRole={userRole}
         />
       )}
     </div>
