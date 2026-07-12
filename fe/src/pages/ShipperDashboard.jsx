@@ -2,6 +2,7 @@ import { API_URL, BASE_URL } from "../api.js";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
+import "./ShipperDashboard.css";
 
 const formatCurrency = (number) => {
   return new Intl.NumberFormat("vi-VN", {
@@ -133,99 +134,44 @@ function ShipperDashboard() {
   const filteredOrders = getFilteredOrders();
 
   return (
-    <div
-      className="container"
-      style={{ padding: "15px", maxWidth: "800px", margin: "0 auto" }}
-    >
-      <h2 style={{ marginBottom: "20px", textAlign: "center" }}>
+    <div className="shipper-container">
+      <h2 className="shipper-title">
         <i className="fas fa-motorcycle" style={{ color: "#e67e22" }}></i> Xin
         chào, Shipper {user?.name || user?.fullname}
       </h2>
 
       {/* Tabs */}
-      <div
-        style={{
-          display: "flex",
-          gap: "10px",
-          marginBottom: "20px",
-          overflowX: "auto",
-          paddingBottom: "5px",
-        }}
-      >
+      <div className="shipper-tabs">
         <button
           onClick={() => setActiveTab("Assigned")}
-          style={{
-            flex: 1,
-            padding: "10px",
-            border: "none",
-            borderRadius: "8px",
-            background: activeTab === "Assigned" ? "#3498db" : "#f1f2f6",
-            color: activeTab === "Assigned" ? "white" : "#333",
-            fontWeight: "bold",
-            whiteSpace: "nowrap",
-          }}
+          className={`shipper-tab-btn ${activeTab === "Assigned" ? "active-assigned" : "inactive"}`}
         >
           Chờ lấy hàng
         </button>
         <button
           onClick={() => setActiveTab("Shipping")}
-          style={{
-            flex: 1,
-            padding: "10px",
-            border: "none",
-            borderRadius: "8px",
-            background: activeTab === "Shipping" ? "#e67e22" : "#f1f2f6",
-            color: activeTab === "Shipping" ? "white" : "#333",
-            fontWeight: "bold",
-            whiteSpace: "nowrap",
-          }}
+          className={`shipper-tab-btn ${activeTab === "Shipping" ? "active-shipping" : "inactive"}`}
         >
           Đang giao
         </button>
         <button
           onClick={() => setActiveTab("History")}
-          style={{
-            flex: 1,
-            padding: "10px",
-            border: "none",
-            borderRadius: "8px",
-            background: activeTab === "History" ? "#2ecc71" : "#f1f2f6",
-            color: activeTab === "History" ? "white" : "#333",
-            fontWeight: "bold",
-            whiteSpace: "nowrap",
-          }}
+          className={`shipper-tab-btn ${activeTab === "History" ? "active-history" : "inactive"}`}
         >
           Lịch sử
         </button>
       </div>
 
       {/* Danh sách đơn */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+      <div className="order-list">
         {filteredOrders.length === 0 ? (
           <p style={{ textAlign: "center", color: "#888", marginTop: "20px" }}>
             Không có đơn hàng nào trong mục này.
           </p>
         ) : (
           filteredOrders.map((order) => (
-            <div
-              key={order.id}
-              style={{
-                background: "white",
-                padding: "15px",
-                borderRadius: "10px",
-                boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  borderBottom: "1px dashed #eee",
-                  paddingBottom: "10px",
-                  marginBottom: "10px",
-                }}
-              >
+            <div key={order.id} className="order-card">
+              <div className="order-header">
                 <span style={{ fontWeight: "bold", fontSize: "16px" }}>
                   Đơn #{order.id}
                 </span>
@@ -234,13 +180,7 @@ function ShipperDashboard() {
                 </span>
               </div>
 
-              <div
-                style={{
-                  marginBottom: "15px",
-                  fontSize: "14px",
-                  lineHeight: "1.6",
-                }}
-              >
+              <div className="order-info">
                 <p>
                   <strong>
                     <i className="fas fa-user"></i> Khách hàng:
@@ -274,18 +214,10 @@ function ShipperDashboard() {
               </div>
 
               {/* Nút hành động */}
-              <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+              <div className="action-buttons">
                 <button
                   onClick={() => setSelectedOrder(order)}
-                  style={{
-                    flex: 1,
-                    padding: "10px",
-                    background: "#f8f9fa",
-                    border: "1px solid #ddd",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                    fontWeight: "bold",
-                  }}
+                  className="action-btn btn-detail"
                 >
                   <i className="fas fa-info-circle"></i> Chi tiết
                 </button>
@@ -293,7 +225,7 @@ function ShipperDashboard() {
 
               {/* Nhập ghi chú trước khi thao tác */}
               {(activeTab === "Assigned" || activeTab === "Shipping") && (
-                <div style={{ marginTop: "15px", marginBottom: "10px" }}>
+                <div>
                   <input
                     type="text"
                     placeholder="Ghi chú (tùy chọn, vd: Hẹn giao mai)..."
@@ -304,25 +236,13 @@ function ShipperDashboard() {
                         [order.id]: e.target.value,
                       }))
                     }
-                    style={{
-                      width: "100%",
-                      padding: "10px",
-                      borderRadius: "6px",
-                      border: "1px solid #ccc",
-                    }}
+                    className="action-note-input"
                   />
                 </div>
               )}
 
               {/* Nút hành động */}
-              <div
-                style={{
-                  display: "flex",
-                  gap: "10px",
-                  flexWrap: "wrap",
-                  marginTop: "10px",
-                }}
-              >
+              <div className="action-buttons">
                 {activeTab === "Assigned" && (
                   <button
                     onClick={() =>
@@ -332,16 +252,7 @@ function ShipperDashboard() {
                         actionNotes[order.id] || "Đã lấy hàng từ kho",
                       )
                     }
-                    style={{
-                      flex: 2,
-                      padding: "10px",
-                      background: "#e67e22",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "6px",
-                      cursor: "pointer",
-                      fontWeight: "bold",
-                    }}
+                    className="action-btn btn-pickup"
                   >
                     <i className="fas fa-box-open"></i> Đã lấy hàng
                   </button>
@@ -356,16 +267,7 @@ function ShipperDashboard() {
                         actionNotes[order.id] || "Giao hàng thành công",
                       )
                     }
-                    style={{
-                      flex: 1,
-                      padding: "10px",
-                      background: "#27ae60",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "6px",
-                      cursor: "pointer",
-                      fontWeight: "bold",
-                    }}
+                    className="action-btn btn-deliver"
                   >
                     <i className="fas fa-check-circle"></i> Giao thành công
                   </button>
@@ -382,16 +284,7 @@ function ShipperDashboard() {
                         setCustomReason("");
                       }
                     }}
-                    style={{
-                      flex: 1,
-                      padding: "10px",
-                      background: "#e74c3c",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "6px",
-                      cursor: "pointer",
-                      fontWeight: "bold",
-                    }}
+                    className="action-btn btn-cancel"
                   >
                     <i className="fas fa-times-circle"></i> Hủy đơn
                   </button>
@@ -408,16 +301,7 @@ function ShipperDashboard() {
                         setCustomReason("");
                       }
                     }}
-                    style={{
-                      flex: 1,
-                      padding: "10px",
-                      background: "#eedf17ff",
-                      color: "#333",
-                      border: "none",
-                      borderRadius: "6px",
-                      cursor: "pointer",
-                      fontWeight: "bold",
-                    }}
+                    className="action-btn btn-fail"
                   >
                     <i className="fas fa-times-circle"></i> Giao thất bại
                   </button>

@@ -1,0 +1,130 @@
+/* ShipperDashboard.css */
+
+/* 1. TIẾP CẬN MOBILE-FIRST (Mặc định CSS viết cho Điện thoại trước) */
+.shipper-container {
+  padding: 15px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.shipper-title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.shipper-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  padding-bottom: 5px;
+}
+
+.shipper-tab-btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.shipper-tab-btn.active-assigned { background: #3498db; color: white; }
+.shipper-tab-btn.active-shipping { background: #e67e22; color: white; }
+.shipper-tab-btn.active-history { background: #2ecc71; color: white; }
+.shipper-tab-btn.inactive { background: #f1f2f6; color: #333; }
+
+/* 2. BỐ CỤC LINH HOẠT (Fluid Layout) VỚI FLEXBOX */
+.order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Dạng Thẻ (Card) hiển thị tràn màn hình trên Mobile */
+.order-card {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dashed #eee;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+
+.order-info {
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+/* 3. TỐI ƯU ĐIỂM CHẠM (Touch-friendly) */
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.action-btn {
+  flex: 1; /* Nút tự động giãn đều 100% không gian */
+  padding: 12px 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  min-height: 44px; /* Chuẩn Touch-friendly: Nút bấm cao tối thiểu 44px */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-detail { background: #f8f9fa; border: 1px solid #ddd; color: #333; }
+.btn-pickup { background: #e67e22; color: white; }
+.btn-deliver { background: #27ae60; color: white; }
+.btn-cancel { background: #e74c3c; color: white; }
+.btn-fail { background: #eedf17; color: #333; }
+
+.action-note-input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-top: 10px;
+  box-sizing: border-box;
+}
+
+/* ========================================================
+   4. SỬ DỤNG MEDIA QUERIES (@media)
+   Tự động điều chỉnh bố cục khi sang màn hình to (Tablet/PC)
+   ======================================================== */
+
+/* Màn hình Tablet (iPad) trở lên */
+@media (min-width: 768px) {
+  /* Chuyển từ dạng danh sách dọc sang dạng Lưới 2 cột (giống Bảng thu nhỏ) */
+  .order-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+/* Màn hình Desktop (Laptop/PC) trở lên */
+@media (min-width: 1024px) {
+  /* Chuyển sang dạng Lưới 3 cột */
+  .order-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
