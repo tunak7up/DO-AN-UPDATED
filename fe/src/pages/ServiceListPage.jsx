@@ -157,7 +157,10 @@ function ServiceListPage() {
 
   const handleSaveService = async (updatedService) => {
     try {
-      const response = await axios.put(`${API_URL}/services/${updatedService.id}`, updatedService);
+      const token = localStorage.getItem('token');
+      const response = await axios.put(`${API_URL}/services/${updatedService.id}`, updatedService, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       if (response.data.success) {
         alert("Cập nhật dịch vụ thành công!");
         setServices(services.map(s => s.id === updatedService.id ? response.data.data : s));

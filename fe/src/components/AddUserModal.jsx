@@ -44,7 +44,10 @@ const AddUserModal = ({ isOpen, onClose, onSuccess }) => {
 
     try {
       setLoading(true);
-      const res = await axios.post(`${API_URL}/users`, formData);
+      const token = localStorage.getItem('token');
+      const res = await axios.post(`${API_URL}/users`, formData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       if (res.data.success) {
         alert("Tạo nhân viên thành công!");
         setFormData({

@@ -181,7 +181,7 @@ function OrderManagePage() {
             >
               <option value="All">Tất cả đơn hàng</option>
               <option value="Pending">Chờ xử lý (Pending)</option>
-              <option value="Processing">Đang chuẩn bị (Processing)</option>
+              <option value="Processing">Đang đóng gói (Processing)</option>
               <option value="Shipping">Đang giao (Shipping)</option>
               <option value="Completed">Hoàn thành (Completed)</option>
               <option value="Not_Delivered">

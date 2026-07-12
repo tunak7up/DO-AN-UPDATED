@@ -1,4 +1,4 @@
-const { Cart, CartItem, Product } = require('../models');
+const { Cart, CartItem, Product, Inventory } = require('../models');
 
 // Lấy giỏ hàng của user
 exports.getCartByUser = async (req, res) => {
@@ -51,13 +51,23 @@ exports.addToCart = async (req, res) => {
     let cartItem = await CartItem.findOne({
       where: { cart_id: cart.id, product_id }
     });
+
+    // Lấy tổng tồn kho từ tất cả các cơ sở
+    const inventories = await Inventory.findAll({ where: { product_id } });
+    const totalStock = inventories.reduce((sum, inv) => sum + inv.quantity, 0);
     
     if (cartItem) {
+      if (cartItem.quantity + quantity > totalStock) {
+        return res.status(400).json({ success: false, message: `Số lượng yêu cầu vượt quá tồn kho hiện tại (${totalStock}).` });
+      }
       // Nếu đã có, tăng số lượng
       await cartItem.update({ 
         quantity: cartItem.quantity + quantity 
       });
     } else {
+      if (quantity > totalStock) {
+        return res.status(400).json({ success: false, message: `Số lượng yêu cầu vượt quá tồn kho hiện tại (${totalStock}).` });
+      }
       // Nếu chưa có, tạo mới
       cartItem = await CartItem.create({
         cart_id: cart.id,
@@ -101,6 +111,13 @@ exports.updateCartItem = async (req, res) => {
       return res.json({ success: true, message: 'Đã xóa sản phẩm khỏi giỏ hàng' });
     }
     
+    const inventories = await Inventory.findAll({ where: { product_id: cartItem.product_id } });
+    const totalStock = inventories.reduce((sum, inv) => sum + inv.quantity, 0);
+    
+    if (quantity > totalStock) {
+        return res.status(400).json({ success: false, message: `Số lượng yêu cầu vượt quá tồn kho hiện tại (${totalStock}).` });
+    }
+
     await cartItem.update({ quantity });
     
     res.json({ success: true, data: cartItem });

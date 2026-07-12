@@ -85,6 +85,7 @@ export const CartProvider = ({ children }) => {
       }
     } catch (error) {
       console.error("Lỗi thêm giỏ:", error);
+      alert(error.response?.data?.message || "Lỗi khi thêm vào giỏ hàng");
     }
   };
 
@@ -106,6 +107,8 @@ export const CartProvider = ({ children }) => {
       }
     } catch (error) {
       console.error("Lỗi cập nhật:", error);
+      alert(error.response?.data?.message || "Lỗi cập nhật số lượng");
+      fetchCart(); // Re-fetch to revert the optimistic UI update if failed
     }
   };
 

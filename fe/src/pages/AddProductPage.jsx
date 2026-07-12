@@ -57,7 +57,10 @@ function AddProductPage() {
 
     // 4. Gọi API
     try {
-      const response = await axios.post(`${API_URL}/products`, newProduct);
+      const token = localStorage.getItem('token');
+      const response = await axios.post(`${API_URL}/products`, newProduct, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
 
       if (response.data.success) {
         alert("Tạo sản phẩm thành công!");

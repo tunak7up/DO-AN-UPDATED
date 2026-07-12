@@ -68,7 +68,10 @@ function EditProductPage() {
     };
 
     try {
-      const response = await axios.put(`${API_URL}/products/${productId}`, updatedProduct);
+      const token = localStorage.getItem('token');
+      const response = await axios.put(`${API_URL}/products/${productId}`, updatedProduct, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       
       if (response.data.success) {
         alert('Cập nhật sản phẩm thành công!');
@@ -82,8 +85,11 @@ function EditProductPage() {
 
   const handleToggleStatus = async () => {
     try {
+      const token = localStorage.getItem('token');
       const newStatus = deleted === 1 ? 0 : 1;
-      const response = await axios.patch(`${API_URL}/products/${productId}/status`, { deleted: newStatus });
+      const response = await axios.patch(`${API_URL}/products/${productId}/status`, { deleted: newStatus }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       if (response.data.success) {
         setDeleted(newStatus);
         alert(response.data.message);

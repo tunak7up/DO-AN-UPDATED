@@ -19,7 +19,10 @@ function UserManagePage() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${API_URL}/users`);
+      const token = localStorage.getItem('token');
+      const res = await axios.get(`${API_URL}/users`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       if (res.data.success) {
         setUsers(res.data.data);
       }
@@ -37,12 +40,15 @@ function UserManagePage() {
   const handleSaveUser = async (updatedUser) => {
     try {
       // Gọi API update
+      const token = localStorage.getItem('token');
       const res = await axios.put(`${API_URL}/users/${updatedUser.id}`, {
         name: updatedUser.name,
         email: updatedUser.email,
         phone: updatedUser.phone,
         address: updatedUser.address,
         role_id: updatedUser.role_id, // Gửi role_id lên server
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
       });
 
       if (res.data.success) {

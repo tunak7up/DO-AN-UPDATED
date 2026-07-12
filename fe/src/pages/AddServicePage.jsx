@@ -50,7 +50,10 @@ function AddServicePage() {
     };
 
     try {
-      const response = await axios.post(`${API_URL}/services`, newService);
+      const token = localStorage.getItem('token');
+      const response = await axios.post(`${API_URL}/services`, newService, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       
       if (response.data.success) {
         alert('Tạo dịch vụ thành công!');

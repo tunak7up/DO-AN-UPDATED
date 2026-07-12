@@ -131,6 +131,7 @@ function InventoryPage() {
   const { user } = useAuth();
   const userRole = user?.role || user?.role_name || 'ROLE_ADMIN';
   const [myStoreIds, setMyStoreIds] = useState([]);
+  const [allStores, setAllStores] = useState([]); // Chứa tất cả cơ sở cho form điều chuyển
 
   // State cho Adjust Modal
   const [adjustModalData, setAdjustModalData] = useState(null);
@@ -203,6 +204,7 @@ function InventoryPage() {
         if (categoryRes.data.success) setCategories(categoryRes.data.data);
         if (storeRes.data.success) {
            let availableStores = storeRes.data.data;
+           setAllStores(availableStores); // Lưu tất cả cơ sở gốc
            
            if (userRole === 'ROLE_WAREHOUSE_MANAGER' && user) {
              const headers = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
@@ -459,7 +461,7 @@ function InventoryPage() {
           isOpen={true}
           onClose={() => setTransferModalData(null)}
           onSave={handleTransferSubmit}
-          stores={stores}
+          stores={allStores}
           product={transferModalData}
           myStoreIds={myStoreIds}
           userRole={userRole}
